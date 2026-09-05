@@ -1,0 +1,265 @@
+src/pages/LeadCapture.tsx:56:            onClick={() => {
+src/pages/Settings.tsx:142:                onClick={() => setActiveTab(tab.id)}
+src/pages/Settings.tsx:232:                  onClick={handleCreateRole}
+src/pages/Settings.tsx:247:                        onClick={() => handleRoleSelect(role.id)}
+src/pages/Settings.tsx:293:                        onClick={saveRoleDetails}
+src/pages/Settings.tsx:661:                  onClick={() => addNotification({ type: 'success', message: 'Preferences saved successfully' })}
+src/pages/Activity.tsx:86:            onClick={() => setActiveTab(tab.id)}
+src/pages/ClientPortal.tsx:66:              onClick={() => setIsExpanded(!isExpanded)}
+src/pages/ClientPortal.tsx:79:               onClick={() => setActiveDetailsTab('overview')}
+src/pages/ClientPortal.tsx:85:               onClick={() => setActiveDetailsTab('finances')}
+src/pages/ClientPortal.tsx:91:               onClick={() => setActiveDetailsTab('tasks')}
+src/pages/ClientPortal.tsx:97:               onClick={() => setActiveDetailsTab('files')}
+src/pages/ClientPortal.tsx:396:              <div className="bg-[#1E2D40] p-6 rounded-2xl border border-slate-700 cursor-pointer hover:border-blue-500/50 transition-colors" onClick={() => setActiveTab('tasks')}>
+src/pages/ClientPortal.tsx:401:              <div className="bg-[#1E2D40] p-6 rounded-2xl border border-slate-700 cursor-pointer hover:border-rose-500/50 transition-colors" onClick={() => setActiveTab('finances')}>
+src/pages/ClientPortal.tsx:853:              onClick={() => setActiveTab(item.id as any)}
+src/pages/ClientPortal.tsx:868:            onClick={logout}
+src/pages/ClientPortal.tsx:887:              onClick={() => setActiveTab('notifications')}
+src/pages/Campaigns.tsx:377:          onClick={() => setIsAddModalOpen(true)}
+src/pages/Campaigns.tsx:415:            onClick={() => setActiveTab(tab as any)}
+src/pages/Campaigns.tsx:441:                onClick={() => {
+src/pages/Campaigns.tsx:523:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setSelectedCampaign(null)} />
+src/pages/Campaigns.tsx:534:                      onClick={markAsCompleted}
+src/pages/Campaigns.tsx:551:              <button onClick={() => setSelectedCampaign(null)} className="text-slate-400 hover:text-white transition-colors p-2 bg-slate-800 rounded-lg">
+src/pages/Campaigns.tsx:559:                onClick={() => setDetailsTab('logistics')}
+src/pages/Campaigns.tsx:565:                onClick={() => setDetailsTab('outcomes')}
+src/pages/Campaigns.tsx:572:                onClick={() => setDetailsTab('reminders')}
+src/pages/Campaigns.tsx:589:                      onClick={() => setShowReminderOptions(!showReminderOptions)}
+src/pages/Campaigns.tsx:600:                        <button onClick={() => setShowReminderOptions(false)} className="text-slate-400 hover:text-white p-1">
+src/pages/Campaigns.tsx:612:                                onClick={() => handleAddReminder(selectedCampaign.id, 'in-app', time)}
+src/pages/Campaigns.tsx:646:                              onClick={() => handleAddReminder(selectedCampaign.id, 'in-app', `${customReminderAmount} ${customReminderUnit}${parseInt(customReminderAmount) !== 1 ? 's' : ''} before`)}
+src/pages/Campaigns.tsx:653:                              onClick={() => handleAddReminder(selectedCampaign.id, 'email', `${customReminderAmount} ${customReminderUnit}${parseInt(customReminderAmount) !== 1 ? 's' : ''} before`)}
+src/pages/Campaigns.tsx:688:                            onClick={() => handleRemoveReminder(selectedCampaign.id, reminder.id)}
+src/pages/Campaigns.tsx:871:                          <button onClick={() => removeNewsLink(i)} className="text-slate-500 hover:text-rose-400 p-1">
+src/pages/Campaigns.tsx:898:                        onClick={() => {
+src/pages/Campaigns.tsx:932:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsAddModalOpen(false)} />
+src/pages/Campaigns.tsx:942:              <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+src/pages/Campaigns.tsx:975:              <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors">Cancel</button>
+src/pages/Dashboard.tsx:88:                  onClick={() => setRole(r as any)}
+src/pages/SocialImpact.tsx:73:            onClick={() => setActiveTab('cases')}
+src/pages/SocialImpact.tsx:79:            onClick={() => setActiveTab('bongoaid')}
+src/pages/Affiliates.tsx:93:            onClick={() => setActiveTab('overview')}
+src/pages/Affiliates.tsx:99:            onClick={() => setActiveTab('manage')}
+src/pages/Affiliates.tsx:105:            onClick={() => setActiveTab('payouts')}
+src/pages/Analytics.tsx:110:            onClick={() => addNotification({ type: 'success', message: `Exporting ${timeRange} report. The download will begin shortly.` })}
+src/pages/Goals.tsx:73:          onClick={() => setIsGoalModalOpen(true)}
+src/pages/Goals.tsx:87:              onClick={() => setFilterType(tab)}
+src/pages/Goals.tsx:179:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsGoalModalOpen(false)} />
+src/pages/Goals.tsx:183:              <button onClick={() => setIsGoalModalOpen(false)} className="text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+src/pages/Goals.tsx:207:                 <button type="button" onClick={() => setIsGoalModalOpen(false)} className="px-4 py-2 text-slate-400 hover:text-white">Cancel</button>
+src/pages/Clients.tsx:124:          onClick={() => setSelectedClient(null)}
+src/pages/Clients.tsx:155:                 onClick={handleGeneratePortalLink}
+src/pages/Clients.tsx:167:                 onClick={() => { setIsEditingAccount(true); setEditFormData(selectedClient); setEmailError(''); }}
+src/pages/Clients.tsx:182:                onClick={() => setClientTab(tab as any)}
+src/pages/Clients.tsx:319:                    onClick={() => setIsEditingAccount(false)}
+src/pages/Clients.tsx:413:                           onClick={() => setActivityFilter(f)}
+src/pages/Clients.tsx:477:                        onClick={handleAddActivity}
+src/pages/Clients.tsx:513:                           onClick={() => addNotification({ type: 'success', message: 'Update email sent directly to client!' })}
+src/pages/Clients.tsx:632:                        onClick={handleSendNotification}
+src/pages/Clients.tsx:686:          onClick={() => setIsAddModalOpen(true)}
+src/pages/Clients.tsx:706:          onClick={() => {
+src/pages/Clients.tsx:719:          <div key={client.id} className="bg-[#1E2D40] p-6 rounded-2xl border border-slate-700/50 hover:border-[#0ED7A8]/50 transition-colors group cursor-pointer" onClick={() => setSelectedClient(client)}>
+src/pages/Clients.tsx:745:              <div className="relative" onClick={(e) => e.stopPropagation()}>
+src/pages/Clients.tsx:747:                  onClick={() => setActiveDropdown(activeDropdown === client.id ? null : client.id)}
+src/pages/Clients.tsx:760:                      onClick={() => {
+src/pages/Clients.tsx:770:                      onClick={() => {
+src/pages/Clients.tsx:779:                      onClick={() => handleDeleteClient(client.id)}
+src/pages/Assets.tsx:142:          onClick={() => setIsAddAssetModalOpen(true)}
+src/pages/Assets.tsx:189:              onClick={() => setActiveTab(tab)}
+src/pages/Assets.tsx:287:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsAddAssetModalOpen(false)} />
+src/pages/Assets.tsx:295:                onClick={() => setIsAddAssetModalOpen(false)}
+src/pages/Assets.tsx:388:                  onClick={() => setIsAddAssetModalOpen(false)}
+src/pages/Expense.tsx:172:            onClick={handleGenerateRecurring}
+src/pages/Expense.tsx:179:            onClick={() => setIsAddModalOpen(true)}
+src/pages/Expense.tsx:260:              onClick={() => setActiveTab(tab)}
+src/pages/Expense.tsx:274:               onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+src/pages/Expense.tsx:289:                     onClick={() => {
+src/pages/Expense.tsx:334:            onClick={() => {
+src/pages/Expense.tsx:386:                             <button onClick={() => handleRemoveReminder(expense.id, rem.id)} className="ml-1 hover:text-white transition-colors">
+src/pages/Expense.tsx:440:                        onClick={() => setActiveDropdown(activeDropdown === expense.id ? null : expense.id)}
+src/pages/Expense.tsx:453:                            onClick={() => {
+src/pages/Expense.tsx:464:                            onClick={() => {
+src/pages/Expense.tsx:474:                            onClick={() => handleDeleteExpense(expense.id)}
+src/pages/Expense.tsx:502:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setReminderConfigExpense(null)} />
+src/pages/Expense.tsx:506:              <button onClick={() => setReminderConfigExpense(null)} className="text-slate-400 hover:text-white transition-colors">
+src/pages/Expense.tsx:541:                onClick={() => setReminderConfigExpense(null)}
+src/pages/Expense.tsx:547:                onClick={handleAddReminder}
+src/pages/Tasks.tsx:624:          onClick={() => setIsAddTaskModalOpen(true)}
+src/pages/Tasks.tsx:637:              onClick={() => setActiveTab(tab)}
+src/pages/Tasks.tsx:651:              onClick={() => setViewMode('list')}
+src/pages/Tasks.tsx:658:              onClick={() => setViewMode('kanban')}
+src/pages/Tasks.tsx:666:            onClick={() => setSortByPriority(prev => prev === 'none' ? 'desc' : prev === 'desc' ? 'asc' : 'none')}
+src/pages/Tasks.tsx:688:                onClick={() => handleBulkStatusChange('Completed')}
+src/pages/Tasks.tsx:694:                onClick={() => handleBulkStatusChange('In Progress')}
+src/pages/Tasks.tsx:704:            <div key={task.id} className="p-4 hover:bg-slate-800/50 transition-colors flex items-center gap-4 group cursor-pointer" onClick={(e) => {
+src/pages/Tasks.tsx:711:              <div className="bulk-checkbox flex items-center" onClick={(e) => e.stopPropagation()}>
+src/pages/Tasks.tsx:721:                  onClick={() => {
+src/pages/Tasks.tsx:744:                        onClick={() => handleStatusChange(task.id, status)}
+src/pages/Tasks.tsx:766:                      onClick={() => setOpenPriorityDropdown(openPriorityDropdown === task.id ? null : task.id)}
+src/pages/Tasks.tsx:778:                            onClick={() => handlePriorityChange(task.id, priority)}
+src/pages/Tasks.tsx:913:                  onClick={() => {
+src/pages/Tasks.tsx:961:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setSelectedTask(null)} />
+src/pages/Tasks.tsx:1009:                onClick={() => setSelectedTask(null)}
+src/pages/Tasks.tsx:1125:                    onClick={handleLogTime}
+src/pages/Tasks.tsx:1164:                          onClick={() => handleRemoveSubtask(selectedTask.id, subtask.id)} 
+src/pages/Tasks.tsx:1191:                    onClick={() => {
+src/pages/Tasks.tsx:1211:                    onClick={() => setShowAddDependency(!showAddDependency)}
+src/pages/Tasks.tsx:1246:                              onClick={() => removeDependency(selectedTask.id, depId)} 
+src/pages/Tasks.tsx:1267:                          onClick={() => addDependency(selectedTask.id, t.id)} 
+src/pages/Tasks.tsx:1287:                    onClick={() => setShowReminderOptions(!showReminderOptions)}
+src/pages/Tasks.tsx:1312:                          onClick={() => handleRemoveReminder(selectedTask.id, reminder.id)} 
+src/pages/Tasks.tsx:1351:                        onClick={() => {
+src/pages/Tasks.tsx:1521:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsAddTaskModalOpen(false)} />
+src/pages/Tasks.tsx:1528:              <button onClick={() => setIsAddTaskModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+src/pages/Tasks.tsx:1566:                <button type="button" onClick={() => setIsAddTaskModalOpen(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors">Cancel</button>
+src/pages/Tasks.tsx:1579:          <button onClick={() => setNotification(null)} className="text-slate-400 hover:text-white ml-2">
+src/pages/Volunteers.tsx:69:            onClick={() => setActiveTab('partners')}
+src/pages/Volunteers.tsx:75:            onClick={() => setActiveTab('ambassadors')}
+src/pages/Volunteers.tsx:81:            onClick={() => setActiveTab('volunteers')}
+src/pages/Documents.tsx:104:              onClick={() => setIsUploadModalOpen(true)}
+src/pages/Documents.tsx:119:              onClick={() => setActiveCategory(cat)}
+src/pages/Documents.tsx:164:                      onClick={() => canAccess && setActiveDropdown(activeDropdown === doc.id ? null : doc.id)}
+src/pages/Documents.tsx:180:                          onClick={() => {
+src/pages/Documents.tsx:192:                          onClick={() => handleDeleteDocument(doc.id)}
+src/pages/HR.tsx:327:            onClick={() => setViewMode('directory')}
+src/pages/HR.tsx:335:            onClick={() => setViewMode('leave')}
+src/pages/HR.tsx:343:            onClick={() => setViewMode('logs')}
+src/pages/HR.tsx:351:            onClick={() => setViewMode('recruitment')}
+src/pages/HR.tsx:359:            onClick={() => setViewMode('performance')}
+src/pages/HR.tsx:367:            onClick={() => setViewMode('onboarding')}
+src/pages/HR.tsx:375:            onClick={() => setViewMode('roles')}
+src/pages/HR.tsx:392:                  onClick={() => setFilterType(tab)}
+src/pages/HR.tsx:473:                        onClick={() => toggleSalaryVisibility(member.id)}
+src/pages/HR.tsx:506:                        onClick={() => handleAttendanceToggle(member.id, member.attendanceStatus)}
+src/pages/HR.tsx:525:                        onClick={() => openAccessModal(member)}
+src/pages/HR.tsx:551:              onClick={() => setIsLeaveModalOpen(true)}
+src/pages/HR.tsx:594:                             <button onClick={() => setLeaveRequests(reqs => reqs.map(r => r.id === leave.id ? { ...r, status: 'Approved' } : r))} className="p-1 text-slate-400 hover:text-emerald-400" title="Approve">
+src/pages/HR.tsx:597:                             <button onClick={() => setLeaveRequests(reqs => reqs.map(r => r.id === leave.id ? { ...r, status: 'Rejected' } : r))} className="p-1 text-slate-400 hover:text-rose-400" title="Reject">
+src/pages/HR.tsx:692:              onClick={() => setIsCandidateModalOpen(true)}
+src/pages/HR.tsx:872:              onClick={() => {
+src/pages/HR.tsx:913:                               onClick={() => {
+src/pages/HR.tsx:929:                                 onClick={() => handleRoleDelete(role.id)}
+src/pages/HR.tsx:952:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsRoleModalOpen(false)} />
+src/pages/HR.tsx:958:              <button onClick={() => setIsRoleModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+src/pages/HR.tsx:1033:               <button onClick={() => setIsRoleModalOpen(false)} className="px-4 py-2 text-slate-400 hover:text-white font-medium text-sm">Cancel</button>
+src/pages/HR.tsx:1045:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsLeaveModalOpen(false)} />
+src/pages/HR.tsx:1084:                 <button type="button" onClick={() => setIsLeaveModalOpen(false)} className="px-4 py-2 text-slate-400 hover:text-white">Cancel</button>
+src/pages/HR.tsx:1095:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsWorkLogModalOpen(false)} />
+src/pages/HR.tsx:1120:                  <button type="button" onClick={() => setIsWorkLogModalOpen(false)} className="px-4 py-2 text-slate-400 hover:text-white">Cancel</button>
+src/pages/HR.tsx:1131:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsAddMemberModalOpen(false)} />
+src/pages/HR.tsx:1139:                onClick={() => setIsAddMemberModalOpen(false)}
+src/pages/HR.tsx:1246:                  onClick={() => setIsAddMemberModalOpen(false)}
+src/pages/HR.tsx:1266:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsAccessModalOpen(false)} />
+src/pages/HR.tsx:1274:                onClick={() => setIsAccessModalOpen(false)}
+src/pages/HR.tsx:1288:                      onClick={() => setSelectedRole(role.id)}
+src/pages/HR.tsx:1326:                onClick={() => setIsAccessModalOpen(false)}
+src/pages/HR.tsx:1332:                onClick={saveAccessLevel}
+src/pages/HR.tsx:1344:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsCandidateModalOpen(false)} />
+src/pages/HR.tsx:1366:                <button type="button" onClick={() => setIsCandidateModalOpen(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors">Cancel</button>
+src/pages/Reports.tsx:286:            onClick={() => setIsSubmitReportModalOpen(true)}
+src/pages/Reports.tsx:298:          onClick={() => setActiveTab('daily')}
+src/pages/Reports.tsx:304:          onClick={() => setActiveTab('financial')}
+src/pages/Reports.tsx:355:            onClick={() => {
+src/pages/Reports.tsx:373:            onClick={() => setSelectedReport(report)}
+src/pages/Reports.tsx:638:              onClick={handleGenerateFinancialReport}
+src/pages/Reports.tsx:798:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsSubmitReportModalOpen(false)} />
+src/pages/Reports.tsx:810:              <button onClick={() => setIsSubmitReportModalOpen(false)} className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-700/50 rounded-lg">
+src/pages/Reports.tsx:901:                <button type="button" onClick={() => setIsSubmitReportModalOpen(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors">Cancel</button>
+src/pages/Reports.tsx:912:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setSelectedReport(null)} />
+src/pages/Reports.tsx:928:              <button onClick={() => setSelectedReport(null)} className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-700/50 rounded-lg">
+src/pages/Reports.tsx:975:          <button onClick={() => setNotification(null)} className="text-slate-400 hover:text-white ml-2">
+src/pages/Invoices.tsx:160:          onClick={() => setIsCreateModalOpen(true)}
+src/pages/Invoices.tsx:273:                        onClick={(e) => {
+src/pages/Invoices.tsx:283:                        onClick={() => setActiveDropdown(activeDropdown === invoice.id ? null : invoice.id)}
+src/pages/Invoices.tsx:296:                            onClick={() => openReminderModal(invoice.id)}
+src/pages/Invoices.tsx:303:                            onClick={() => {
+src/pages/Invoices.tsx:313:                            onClick={() => handleDeleteInvoice(invoice.id)}
+src/pages/Invoices.tsx:337:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsReminderModalOpen(false)} />
+src/pages/Invoices.tsx:365:                    onClick={() => setReminderType('in-app')}
+src/pages/Invoices.tsx:374:                    onClick={() => setReminderType('email')}
+src/pages/Invoices.tsx:387:                  onClick={() => setIsReminderModalOpen(false)} 
+src/pages/Projects.tsx:604:          onClick={() => setIsAddProjectModalOpen(true)}
+src/pages/Projects.tsx:723:              onClick={() => setViewMode('grid')}
+src/pages/Projects.tsx:729:              onClick={() => setViewMode('timeline')}
+src/pages/Projects.tsx:741:          <div key={project.id} className="bg-[#1E2D40] p-6 rounded-2xl border border-slate-700/50 hover:border-[#0ED7A8]/50 transition-colors group cursor-pointer" onClick={(e) => {
+src/pages/Projects.tsx:796:                  onClick={() => setOpenStatusDropdown(openStatusDropdown === project.id ? null : project.id)}
+src/pages/Projects.tsx:808:                        onClick={() => handleStatusChange(project.id, status)}
+src/pages/Projects.tsx:930:                    <div className="flex border-b border-slate-700/50 group hover:bg-slate-800/30 transition-colors cursor-pointer" onClick={() => setSelectedProject(project)}>
+src/pages/Projects.tsx:933:                          onClick={(e) => {
+src/pages/Projects.tsx:985:                          onClick={(e) => { e.stopPropagation(); setSelectedProject(project); }}
+src/pages/Projects.tsx:1006:                              onClick={(e) => { e.stopPropagation(); setSelectedProject(project); }}
+src/pages/Projects.tsx:1134:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsAddProjectModalOpen(false)} />
+src/pages/Projects.tsx:1141:              <button onClick={() => setIsAddProjectModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+src/pages/Projects.tsx:1215:                <button type="button" onClick={() => setIsAddProjectModalOpen(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors">Cancel</button>
+src/pages/Projects.tsx:1226:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setSelectedProject(null)} />
+src/pages/Projects.tsx:1238:              <button onClick={() => setSelectedProject(null)} className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-700/50 rounded-lg">
+src/pages/Projects.tsx:1339:                         onClick={() => {
+src/pages/Projects.tsx:1375:                    onClick={() => {
+src/pages/Projects.tsx:1535:                          onClick={() => {
+src/pages/Projects.tsx:1568:                    onClick={() => {
+src/pages/Projects.tsx:1608:                            onClick={() => {
+src/pages/Projects.tsx:1670:          <button onClick={() => setNotification(null)} className="text-slate-400 hover:text-white ml-2">
+src/pages/Meetings.tsx:230:          onClick={() => setIsAddModalOpen(true)}
+src/pages/Meetings.tsx:277:            onClick={() => setActiveTab(tab as any)}
+src/pages/Meetings.tsx:309:                                 onClick={() => openMeetingDetails(m)}
+src/pages/Meetings.tsx:339:                onClick={() => openMeetingDetails(meeting)}
+src/pages/Meetings.tsx:416:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setSelectedMeeting(null)} />
+src/pages/Meetings.tsx:428:                      onClick={markAsCompleted}
+src/pages/Meetings.tsx:445:              <button onClick={() => setSelectedMeeting(null)} className="text-slate-400 hover:text-white transition-colors p-2 bg-slate-800 rounded-lg">
+src/pages/Meetings.tsx:453:                onClick={() => setDetailsTab('prep')}
+src/pages/Meetings.tsx:459:                onClick={() => setDetailsTab('outcomes')}
+src/pages/Meetings.tsx:466:                onClick={() => setDetailsTab('reminders')}
+src/pages/Meetings.tsx:472:                onClick={() => setDetailsTab('ai-bot')}
+src/pages/Meetings.tsx:503:                            onClick={() => togglePrepItem(selectedMeeting.id, item.id)}
+src/pages/Meetings.tsx:532:                      <button onClick={saveNotes} className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors">
+src/pages/Meetings.tsx:556:                            onClick={() => toggleActionItem(selectedMeeting.id, item.id)}
+src/pages/Meetings.tsx:632:                              onClick={() => {
+src/pages/Meetings.tsx:674:                          onClick={() => {
+src/pages/Meetings.tsx:774:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsAddModalOpen(false)} />
+src/pages/Meetings.tsx:781:              <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+src/pages/Meetings.tsx:827:                        <button type="button" onClick={() => setTempPrepItems(tempPrepItems.filter(p => p.id !== item.id))} className="text-slate-500 hover:text-rose-400">
+src/pages/Meetings.tsx:852:                      onClick={() => {
+src/pages/Meetings.tsx:884:                          <button type="button" onClick={() => setTempReminders(tempReminders.filter(r => r.id !== rem.id))} className="text-slate-500 hover:text-rose-400 ml-2">
+src/pages/Meetings.tsx:917:                        onClick={() => {
+src/pages/Meetings.tsx:946:              <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors">Cancel</button>
+src/pages/Leads.tsx:146:            onClick={() => {
+src/pages/Leads.tsx:156:            onClick={handleScoreLeads}
+src/pages/Leads.tsx:168:            onClick={handleGenerateLeads}
+src/pages/Leads.tsx:180:            onClick={() => setIsAddModalOpen(true)}
+src/pages/Leads.tsx:239:            onClick={() => setViewMode('board')}
+src/pages/Leads.tsx:245:            onClick={() => setViewMode('list')}
+src/pages/Leads.tsx:302:                               onClick={(e) => { e.stopPropagation(); setSelectedLead(lead); }}
+src/pages/Leads.tsx:423:                      <button onClick={(e) => {e.stopPropagation(); setSelectedLead(lead);}} className="text-slate-400 hover:text-white p-1">
+src/pages/Leads.tsx:438:          <div className="absolute inset-0" onClick={() => setSelectedLead(null)} />
+src/pages/Leads.tsx:448:              <button onClick={() => setSelectedLead(null)} className="text-slate-400 hover:text-white p-2">
+src/pages/Leads.tsx:526:                     <button onClick={handleAddActivity} className="bg-[#0ED7A8] hover:bg-[#0ED7A8]/90 text-slate-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+src/pages/Leads.tsx:541:          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsAddModalOpen(false)} />
+src/pages/Leads.tsx:591:                <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors">Cancel</button>
+src/components/Layout.tsx:87:        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+src/components/Layout.tsx:94:            <button onClick={() => setSidebarOpen(false)} className="text-slate-400 hover:text-white">
+src/components/Layout.tsx:103:                onClick={() => setSidebarOpen(false)}
+src/components/Layout.tsx:157:            <button onClick={logout} className="p-2 text-slate-400 hover:text-white transition-colors" title="Sign Out">
+src/components/Layout.tsx:168:            <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-slate-400 hover:text-white">
+src/components/Layout.tsx:174:                onClick={() => window.dispatchEvent(new CustomEvent('open-command-palette'))}
+src/components/Layout.tsx:185:              onClick={() => {
+src/components/Layout.tsx:197:              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+src/components/CommandPalette.tsx:85:      <div className="absolute inset-0" onClick={() => setIsOpen(false)}></div>
+src/components/CommandPalette.tsx:127:                      <button onClick={() => setQuery('? What is our total revenue?')} className="text-left py-2 px-4 ml-8 rounded-lg hover:bg-slate-800 text-sm text-slate-400 hover:text-slate-200 transition-colors">"What is our total revenue?"</button>
+src/components/CommandPalette.tsx:128:                      <button onClick={() => setQuery('? Show me high priority tasks')} className="text-left py-2 px-4 ml-8 rounded-lg hover:bg-slate-800 text-sm text-slate-400 hover:text-slate-200 transition-colors">"Show me high priority tasks"</button>
+src/components/CommandPalette.tsx:139:                onClick={() => {
+src/components/RecordExpenseModal.tsx:105:            onClick={onClose}
+src/components/RecordExpenseModal.tsx:198:                onClick={() => fileInputRef.current?.click()}
+src/components/RecordExpenseModal.tsx:245:                  onClick={removeFile}
+src/components/RecordExpenseModal.tsx:297:              onClick={onClose}
+src/components/QuickAddFab.tsx:45:              onClick={() => handleAction(action.path, action.name)}
+src/components/QuickAddFab.tsx:60:        onClick={() => setIsOpen(!isOpen)}
+src/components/UploadDocumentModal.tsx:106:            onClick={onClose}
+src/components/UploadDocumentModal.tsx:147:                  onClick={(e) => {
+src/components/UploadDocumentModal.tsx:157:              <div className="flex flex-col items-center gap-3 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+src/components/UploadDocumentModal.tsx:222:              onClick={onClose}
+src/components/NotificationPanel.tsx:58:           onClick={onClose}
+src/components/NotificationPanel.tsx:86:          onClick={onClose}
+src/components/CreateInvoiceModal.tsx:50:            onClick={onClose}
+src/components/CreateInvoiceModal.tsx:163:              onClick={onClose}
+src/components/AddClientModal.tsx:65:            onClick={onClose}
+src/components/AddClientModal.tsx:174:                onClick={onClose}

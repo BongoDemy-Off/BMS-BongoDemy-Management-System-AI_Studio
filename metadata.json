@@ -1,0 +1,6 @@
+{
+  "name": "BongoDemy Management System",
+  "description": "A secure, responsive management system for BongoDemy team and clients, featuring task, project, client, and invoice management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
