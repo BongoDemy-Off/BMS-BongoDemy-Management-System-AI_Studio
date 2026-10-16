@@ -1,16 +1,18 @@
+import { LeadActivity } from '../types';
 import React, { useState } from 'react';
-import { GoogleGenAI, Type } from '@google/genai';
 import { Plus, Search, Filter, MoreHorizontal, Mail, Phone, Building2, Calendar, Target, DollarSign, ArrowUpRight, TrendingUp, X, Sparkles } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 const STAGES = ['New', 'Contacted', 'Proposal Sent', 'Negotiation', 'Won', 'Lost'];
 
 export function Leads() {
-  const { leads, setLeads, addNotification } = useAppContext();
+  const leads = useAppContext(s => s.leads);
+  const setLeads = useAppContext(s => s.setLeads);
+  const addNotification = useAppContext(s => s.addNotification);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [selectedLead, setSelectedLead] = useState<any | null>(null);
+  const [selectedLead, setSelectedLead] = useState<any>(null);
   const [isGeneratingLeads, setIsGeneratingLeads] = useState(false);
   const [isScoringLeads, setIsScoringLeads] = useState(false);
   const [newActivity, setNewActivity] = useState({ type: 'Note', content: '' });
@@ -50,40 +52,30 @@ export function Leads() {
   const handleScoreLeads = async () => {
     setIsScoringLeads(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const prompt = `You are an expert sales AI. Review the following list of sales leads and give each one a score from 1 to 99 based on their engagement, value, probability, stage, and activities.
-      
-Leads: ${JSON.stringify(leads, null, 2)}`;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                id: { type: Type.INTEGER, description: "Lead ID" },
-                aiScore: { type: Type.INTEGER, description: "Lead Score between 1 and 99" }
-              },
-              required: ["id", "aiScore"]
-            }
-          }
-        }
+      const response = await fetch('/api/score-leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ leads })
       });
+      
+      if (!response.ok) {
+        throw new Error('Failed to score leads');
+      }
 
-      const resultText = response.text;
-      if (resultText) {
-        const scores = JSON.parse(resultText);
+      const data = await response.json();
+      const scores = data.scores;
+      
+      if (scores) {
         setLeads(prev => prev.map(l => {
-          const match = scores.find((s: any) => s.id === l.id);
+          const match = scores.find((s: { id: number | string; aiScore: number }) => s.id === l.id);
           return match ? { ...l, aiScore: match.aiScore } : l;
         }));
       }
     } catch (e) {
       console.error("Error scoring leads", e);
+      addNotification({ type: 'error', message: 'Failed to score leads' });
     } finally {
       setIsScoringLeads(false);
     }
@@ -488,7 +480,7 @@ Leads: ${JSON.stringify(leads, null, 2)}`;
               <div>
                 <h3 className="text-sm font-bold text-white mb-4 uppercase tracking-wider">Activity History</h3>
                 <div className="space-y-4">
-                  {(selectedLead.activities || []).map((act: any) => (
+                  {(selectedLead.activities || []).map((act: LeadActivity | any) => (
                     <div key={act.id} className="bg-slate-800/20 border border-slate-700/30 p-4 rounded-xl">
                       <div className="flex justify-between items-start mb-2">
                         <span className="text-xs font-medium text-[#0ED7A8] px-2 py-0.5 rounded-md bg-[#0ED7A8]/10 border border-[#0ED7A8]/20">{act.type}</span>

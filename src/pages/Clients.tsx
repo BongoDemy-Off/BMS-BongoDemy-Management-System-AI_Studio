@@ -1,3 +1,4 @@
+import { Client, ClientContact, Deal, ClientActivity } from '../types';
 import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Search, Mail, Phone, MapPin, MoreVertical, Building2, Edit2, Trash2, Download, ChevronLeft, Calendar, FileText, CheckCircle2, Circle, ArrowUpRight, MessageSquare, Briefcase, Link as LinkIcon, DollarSign, Bell } from 'lucide-react';
 import { AddClientModal } from '../components/AddClientModal';
@@ -5,13 +6,15 @@ import { useAppContext } from '../context/AppContext';
 
 export function Clients() {
   const [searchTerm, setSearchTerm] = useState('');
-  const { clients, setClients, addNotification } = useAppContext();
+  const clients = useAppContext(s => s.clients);
+  const setClients = useAppContext(s => s.setClients);
+  const addNotification = useAppContext(s => s.addNotification);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // CRM Detail view state
-  const [selectedClient, setSelectedClient] = useState<any | null>(null);
+  const [selectedClient, setSelectedClient] = useState<any>(null);
   const [clientTab, setClientTab] = useState<'overview' | 'contacts' | 'activities' | 'deals' | 'async-comms' | 'notifications'>('overview');
   const [newActivity, setNewActivity] = useState({ type: 'Note', description: '' });
 
@@ -45,7 +48,7 @@ export function Clients() {
       channels
     };
 
-    setClients((prev: any) => prev.map((c: any) => {
+    setClients((prev: Client[]) => prev.map((c: Client) => {
       if (c.id === selectedClient.id) {
         return {
           ...c,
@@ -55,7 +58,7 @@ export function Clients() {
       return c;
     }));
 
-    setSelectedClient((prev: any) => ({
+    setSelectedClient((prev: Client | null) => ({
       ...prev,
       notifications: [notificationPayload, ...(prev.notifications || [])]
     }));
@@ -74,7 +77,7 @@ export function Clients() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleAddClient = (newClient: any) => {
+  const handleAddClient = (newClient: Client) => {
     setClients([{ ...newClient, about: '', contacts: [], activities: [], deals: [] }, ...clients]);
     addNotification({ type: 'success', message: 'Client added successfully' });
   };
@@ -217,7 +220,7 @@ export function Clients() {
                   <div>
                     <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Recent Activity</h3>
                     <div className="space-y-4">
-                      {(selectedClient.activities || []).slice(0, 3).map((act: any) => (
+                      {(selectedClient.activities || []).slice(0, 3).map((act: any | ClientActivity) => (
                         <div key={act.id} className="relative pl-6 border-l-2 border-slate-700">
                           <span className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-[#0ED7A8]"></span>
                           <div className="text-xs text-[#0ED7A8] font-medium mb-1">{act.type} • {act.date}</div>
@@ -337,7 +340,7 @@ export function Clients() {
                   <h3 className="text-lg font-semibold text-white">Contacts</h3>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {(selectedClient.contacts || []).map((contact: any) => (
+                  {(selectedClient.contacts || []).map((contact: ClientContact) => (
                     <div key={contact.id} className="bg-slate-800/40 border border-slate-700/50 p-4 rounded-xl hover:border-slate-600 transition-colors">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 font-semibold">
@@ -375,7 +378,7 @@ export function Clients() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-700/50">
-                      {(selectedClient.deals || []).map((deal: any) => (
+                      {(selectedClient.deals || []).map((deal: Deal) => (
                         <tr key={deal.id} className="hover:bg-slate-800/30 transition-colors">
                           <td className="px-6 py-4 font-medium text-white">{deal.name}</td>
                           <td className="px-6 py-4 text-emerald-400 font-semibold">{deal.value}</td>
@@ -422,8 +425,8 @@ export function Clients() {
                   </div>
                   <div className="space-y-6">
                     {(selectedClient.activities || [])
-                      .filter((act: any) => activityFilter === 'All' || act.type === activityFilter)
-                      .map((act: any) => (
+                      .filter((act: any | ClientActivity) => activityFilter === 'All' || act.type === activityFilter)
+                      .map((act: any | ClientActivity) => (
                       <div key={act.id} className="relative pl-8 border-l-2 border-slate-700 pb-2">
                         <span className="absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-slate-800 border-2 border-[#0ED7A8] flex items-center justify-center"></span>
                         <div className="bg-slate-800/30 rounded-xl p-4 border border-slate-700/50 hover:border-[#0ED7A8]/30 transition-colors">
@@ -444,7 +447,7 @@ export function Clients() {
                       </div>
                     )}
                     {selectedClient.activities?.length > 0 && activityFilter !== 'All' && 
-                     (selectedClient.activities || []).filter((act: any) => act.type === activityFilter).length === 0 && (
+                     (selectedClient.activities || []).filter((act: any | ClientActivity) => act.type === activityFilter).length === 0 && (
                       <div className="text-center p-8 bg-slate-800/20 rounded-xl border border-slate-700/50 border-dashed">
                         <FileText className="w-8 h-8 text-slate-600 mx-auto mb-3" />
                         <p className="text-slate-400 text-sm">No activities of type "{activityFilter}" found.</p>
@@ -649,7 +652,7 @@ export function Clients() {
                              <p className="text-slate-400 text-xs">No notifications sent yet.</p>
                           </div>
                         ) : (
-                          selectedClient.notifications.map((notif: any) => (
+                          selectedClient.notifications.map((notif: Notification) => (
                              <div key={notif.id} className="p-3 bg-slate-900/50 rounded-lg border border-slate-700 relative">
                                 <div className="absolute top-3 right-3 text-xs text-slate-500">{new Date(notif.date).toLocaleDateString()}</div>
                                 <h4 className="text-sm font-medium text-white pr-16">{notif.title}</h4>

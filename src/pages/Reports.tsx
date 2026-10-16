@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Plus, Search, Filter, Calendar as CalendarIcon, Clock, X, Bell, FileText, CheckCircle2, BarChart3, DollarSign, TrendingUp, Download, Building2, Activity, ShieldAlert, Lock, AlertTriangle, Mail } from 'lucide-react';
+import { Plus, Search, Filter, Settings, FileCode2, Edit3, Trash2, Calendar as CalendarIcon, Clock, X, Bell, FileText, CheckCircle2, BarChart3, DollarSign, TrendingUp, Download, Building2, Activity, ShieldAlert, Lock, AlertTriangle, Mail } from 'lucide-react';
 import { initialExpenses } from './Expense';
 import { initialInvoices } from './Invoices';
+import { useAppContext } from '../context/AppContext';
 
 const initialReports = [
   {
@@ -37,7 +38,7 @@ const initialReports = [
 ];
 
 export function Reports() {
-  const [activeTab, setActiveTab] = useState<'daily' | 'financial' | 'vapt' | 'scheduled'>('daily');
+  const [activeTab, setActiveTab] = useState<'daily' | 'financial' | 'vapt' | 'scheduled' | 'templates'>('daily');
   const [reports, setReports] = useState(initialReports);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMember, setFilterMember] = useState('All');
@@ -48,6 +49,13 @@ export function Reports() {
   const [selectedFinancialReportType, setSelectedFinancialReportType] = useState('income'); // income, balance, cashflow
   const [financialPeriod, setFinancialPeriod] = useState('All');
   const [isGenerating, setIsGenerating] = useState(false);
+
+  const reportTemplates = useAppContext(s => (s as any).reportTemplates || []);
+  const setReportTemplates = useAppContext(s => (s as any).setReportTemplates);
+  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
+  const [templateForm, setTemplateForm] = useState({ name: '', structure: '' });
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+
   const [generatedReport, setGeneratedReport] = useState<any>(null);
 
   // Scheduled Report States
@@ -57,7 +65,7 @@ export function Reports() {
 
   const financialMetrics = useMemo(() => {
     // Income Statement
-    const revenue = initialInvoices.filter(inv => inv.status === 'Paid').reduce((sum, inv) => sum + inv.amount, 0);
+    const revenue = initialInvoices.filter(inv => inv.status === 'Paid').reduce((sum, inv) => sum + Number(inv.amount), 0);
     const cogs = initialExpenses.filter(exp => exp.category === 'Hardware' || exp.category === 'Software').reduce((sum, exp) => sum + exp.amount, 0); // Simplified COGS
     const operatingExpenses = initialExpenses.filter(exp => exp.status === 'Paid' || exp.status === 'Approved')
       .reduce((sum, exp) => sum + exp.amount, 0) - cogs;
@@ -68,7 +76,7 @@ export function Reports() {
 
     // Balance Sheet
     const cash = 50000; // Starting cash
-    const accountsReceivable = initialInvoices.filter(inv => inv.status === 'Pending' || inv.status === 'Overdue').reduce((sum, inv) => sum + inv.amount, 0);
+    const accountsReceivable = initialInvoices.filter(inv => inv.status === 'Pending' || inv.status === 'Overdue').reduce((sum, inv) => sum + Number(inv.amount), 0);
     const currentAssets = cash + accountsReceivable;
     
     // Import and use initialAssets if needed for Non-Current Assets
@@ -325,6 +333,13 @@ export function Reports() {
         >
           <Mail className="w-4 h-4" />
           Scheduled Reports
+        </button>
+<button
+          onClick={() => setActiveTab('templates')}
+          className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${activeTab === 'templates' ? 'border-[#0ED7A8] text-[#0ED7A8]' : 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-500'}`}
+        >
+          <FileCode2 className="w-4 h-4" />
+          AI Templates
         </button>
       </div>
 

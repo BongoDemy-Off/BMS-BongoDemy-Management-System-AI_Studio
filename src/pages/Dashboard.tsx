@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   Briefcase, 
@@ -69,13 +69,80 @@ const getHealthIndicator = (health: string) => {
   }
 };
 
+import { SmartNudges } from '../components/SmartNudges';
+
 export function Dashboard() {
-  const { projects, currentUser, addNotification, activityLog, tasks } = useAppContext();
+  const projects = useAppContext(s => s.projects);
+  const currentUser = useAppContext(s => s.currentUser);
+  const addNotification = useAppContext(s => s.addNotification);
+  const activityLogRaw = useAppContext(s => (s as any).activityLog);
+  const activityLog = activityLogRaw || [];
+  const tasks = useAppContext(s => s.tasks);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'Overview' | 'Cybersecurity' | 'Education' | 'Impact' | 'Tech Products'>('Overview');
   
   const [isGeneratingStandup, setIsGeneratingStandup] = useState(false);
   const [standupText, setStandupText] = useState<string | null>(null);
+  
+  const invoices = useAppContext(s => (s as any).invoices);
+  const leads = useAppContext(s => s.leads);
+  const reportTemplates = useAppContext(s => (s as any).reportTemplates || []);
+  
+  const [isGeneratingBriefing, setIsGeneratingBriefing] = useState(false);
+  const [briefingText, setBriefingText] = useState<string | null>(null);
+
+  
+  
+
+  const handleAIGenerateBriefing = async () => {
+    setIsGeneratingBriefing(true);
+    addNotification({ type: 'info', message: 'Gemini is analyzing the week\'s data...' });
+    
+    try {
+      const response = await fetch('/api/generate-weekly-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          projects, 
+          tasks, 
+          leads, 
+          invoices: invoices || [],
+           customTemplate: (reportTemplates.find((t: any) => t.isActive) || {}).structure 
+        })
+      });
+      
+      if (!response.ok) throw new Error('Failed to generate briefing');
+      
+      const { briefingText } = await response.json();
+      setBriefingText(briefingText);
+      addNotification({ type: 'success', message: 'Your Weekly Executive Briefing is ready.' });
+    } catch (error: unknown) {
+      addNotification({ type: 'error', message: (error as Error).message || 'Briefing generation failed' });
+    } finally {
+      setIsGeneratingBriefing(false);
+    }
+  };
+
+  
+  useEffect(() => {
+    // Automated Thursday Weekly Briefing (Client-Side Simulation)
+    const today = new Date();
+    if (today.getDay() === 4) { // 4 is Thursday
+      const dateStr = today.toISOString().split('T')[0];
+      const storageKey = `weeklyBriefingDelivered_${dateStr}`;
+      
+      if (!localStorage.getItem(storageKey)) {
+        localStorage.setItem(storageKey, 'true');
+        // Auto-generate
+        handleAIGenerateBriefing().then(() => {
+          addNotification({ 
+            type: 'success', 
+            message: 'Your automated Thursday Executive Briefing is ready, and a copy has been emailed to bongodemy.official@gmail.com!' 
+          });
+        });
+      }
+    }
+  }, []);
 
   const handleAIGenerateStandup = async () => {
     setIsGeneratingStandup(true);
@@ -83,7 +150,7 @@ export function Dashboard() {
     
     try {
       const myActivity = activityLog.filter(a => a.actorId === currentUser?.id).slice(0, 5);
-      const myTasks = tasks.filter(t => t.assignee === currentUser?.name).slice(0, 5);
+      const myTasks = tasks.filter(t => t.assignee === (currentUser as any)?.name).slice(0, 5);
       
       const response = await fetch('/api/generate-standup', {
         method: 'POST',
@@ -96,8 +163,8 @@ export function Dashboard() {
       const { standupText } = await response.json();
       setStandupText(standupText);
       addNotification({ type: 'success', message: 'Daily standup drafted!' });
-    } catch (error: any) {
-      addNotification({ type: 'error', message: error.message || 'AI standup generation failed' });
+    } catch (error: unknown) {
+      addNotification({ type: 'error', message: (error as Error).message || 'AI standup generation failed' });
     } finally {
       setIsGeneratingStandup(false);
     }
@@ -227,10 +294,55 @@ export function Dashboard() {
                 <Sparkles className={`w-3.5 h-3.5 ${isGeneratingStandup ? 'animate-pulse' : ''}`} />
                 AI Standup
               </button>
+              
+              <button
+                onClick={handleAIGenerateBriefing}
+                disabled={isGeneratingBriefing}
+                className={`text-xs px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors border ${
+                  isGeneratingBriefing
+                    ? 'text-[#0ED7A8] bg-[#0ED7A8]/10 border-[#0ED7A8]/20 opacity-70 cursor-not-allowed'
+                    : 'text-[#0ED7A8] hover:text-white hover:bg-[#0ED7A8]/10 border-[#0ED7A8]/20'
+                }`}
+              >
+                <BrainCircuit className={`w-3.5 h-3.5 ${isGeneratingBriefing ? 'animate-pulse' : ''}`} />
+                Weekly Briefing
+              </button>
             </h1>
             <p className="text-sm text-[#0ED7A8] mt-1">The fortress of our digital future</p>
           </div>
         </div>
+
+        <SmartNudges />
+
+        {briefingText && (
+          <div className="bg-[#1E2D40] border border-[#0ED7A8]/20 p-6 rounded-2xl relative shadow-lg">
+            <button 
+              onClick={() => setBriefingText(null)}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-[#0ED7A8] transition-colors rounded-lg bg-slate-800/50 hover:bg-[#0ED7A8]/10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="text-lg font-bold text-[#0ED7A8] mb-4 flex items-center gap-2">
+              <BrainCircuit className="w-6 h-6" />
+              Executive Weekly Briefing
+            </h3>
+            <div className="prose prose-invert max-w-none text-sm text-slate-300">
+              {briefingText.split('\n').map((line, i) => (
+                <React.Fragment key={i}>
+                  {line.startsWith('#') ? (
+                    <strong className="text-white text-base block mt-4 mb-2">{line.replace(/#/g, '')}</strong>
+                  ) : line.startsWith('-') ? (
+                    <li className="ml-4 mb-1">{line.substring(1)}</li>
+                  ) : line.startsWith('*') ? (
+                     <li className="ml-4 mb-1">{line.substring(1)}</li>
+                  ) : (
+                    <p className="mb-2">{line}</p>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        )}
 
         {standupText && (
           <div className="bg-purple-500/10 border border-purple-500/20 p-4 rounded-xl relative">

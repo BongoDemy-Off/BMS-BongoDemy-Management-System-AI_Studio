@@ -1,3 +1,4 @@
+import React from 'react';
 import { Shield, Globe, PenTool, BarChart } from 'lucide-react';
 
 export type Task = {
@@ -244,14 +245,14 @@ export type Project = {
   deadline: string;
   budget: number;
   spent: number;
-  team: any[];
+  team: (string | { name: string, role?: string, avatar?: string })[];
   timeSpent?: number;
   activity?: { id: number; type: string; text: string; time: string; }[];
   milestones: { id: number, title: string, date: string }[];
   tasks: { id: number, title: string, startDate: string, deadline: string, progress: number, assignee: string, dependencies: number[], status?: string, lastActiveProgress?: number, subtasks?: { id: number, title: string, completed: boolean }[] }[];
   attachments?: { id: number, name: string, size: string, uploadDate: string, type: string }[];
   requiredSkills?: string[];
-  icon: any;
+  icon: React.ElementType;
   color: string;
   bg: string;
   workflows?: { id: number, title: string, steps: string[] }[];

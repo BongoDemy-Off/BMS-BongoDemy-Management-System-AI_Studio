@@ -65,7 +65,12 @@ const PRIORITIES = ['high', 'medium', 'low'];
 const STATUSES = ['Not Started', 'In Progress', 'Review', 'Completed'];
 
 export function Tasks() {
-  const { addNotification, userPreferences, tasks, setTasks, currentUser, teamMembers } = useAppContext();
+  const addNotification = useAppContext(s => s.addNotification);
+  const userPreferences = useAppContext(s => s.userPreferences);
+  const tasks = useAppContext(s => s.tasks);
+  const setTasks = useAppContext(s => s.setTasks);
+  const currentUser = useAppContext(s => s.currentUser);
+  const teamMembers = useAppContext(s => s.teamMembers);
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>(userPreferences?.defaultTaskView || 'list');
   const [activeTab, setActiveTab] = useState('all');
   const [isPrioritizing, setIsPrioritizing] = useState(false);
@@ -242,7 +247,7 @@ export function Tasks() {
 
   // Timer interval and auto-commit
   useEffect(() => {
-    let interval: any;
+    let interval: NodeJS.Timeout | null = null;
     if (activeTaskTimer?.isRunning) {
       interval = setInterval(() => {
          const addedSeconds = Math.floor((Date.now() - activeTaskTimer.sessionStart) / 1000);
@@ -332,7 +337,7 @@ export function Tasks() {
     }
   };
 
-  const handleUpdateSelectedTask = (field: keyof Task, value: any) => {
+  const handleUpdateSelectedTask = (field: keyof Task, value: string | number | boolean | any) => {
     setTasks(prev => prev.map(t => t.id === selectedTask?.id ? { ...t, [field]: value } : t));
     if (selectedTask) {
       logActivity(selectedTask.id, 'update', `Updated ${field.toString()}`);
@@ -543,7 +548,7 @@ export function Tasks() {
         addNotification({ type: 'success', message: 'Subtasks generated successfully' });
       }
     } catch (error: any) {
-      addNotification({ type: 'error', message: error.message || 'AI generation failed' });
+      addNotification({ type: 'error', message: (error as any).message || 'AI generation failed' });
     } finally {
       setIsGeneratingSubtasks(false);
     }
@@ -774,7 +779,7 @@ export function Tasks() {
         addNotification({ type: 'success', message: 'Tasks prioritized successfully by AI' });
       }
     } catch (error: any) {
-      addNotification({ type: 'error', message: error.message || 'AI prioritization failed' });
+      addNotification({ type: 'error', message: (error as any).message || 'AI prioritization failed' });
     } finally {
       setIsPrioritizing(false);
     }

@@ -130,7 +130,10 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick }) => {
 
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
-  const { notifications, markNotificationRead, markAllNotificationsRead, logout } = useAppContext();
+  const notifications = useAppContext(s => s.notifications);
+  const markNotificationRead = useAppContext(s => s.markNotificationRead);
+  const markAllNotificationsRead = useAppContext(s => s.markAllNotificationsRead);
+  const logout = useAppContext(s => s.logout);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
 

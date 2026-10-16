@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 interface DebouncedInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value'> {
   value: string | number;
-  onChange: (e: any) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   debounceMs?: number;
 }
 
@@ -42,7 +42,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({ value, onChange,
 
 interface DebouncedTextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'value'> {
   value: string | number;
-  onChange: (e: any) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   debounceMs?: number;
 }
 

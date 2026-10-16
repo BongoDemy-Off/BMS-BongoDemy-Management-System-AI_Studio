@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Minus, Search, Filter, MoreVertical, Shield, Globe, PenTool, BarChart, ChevronDown, X, Bell, Calendar, UserPlus, FileText, Download, Paperclip, DollarSign, CheckCircle2, AlertTriangle, Clock, XCircle, Mail, MessageCircle, Smartphone, Send, FolderOpen, Activity, Sparkles, CheckSquare } from 'lucide-react';
+import { Plus, Minus, Search, Filter, MoreVertical, Shield, Globe, PenTool, BarChart, ChevronDown, X, Bell, Calendar, UserPlus, FileText, Download, Paperclip, DollarSign, CheckCircle2, AlertTriangle, Clock, XCircle, Mail, MessageCircle, Smartphone, Send, FolderOpen, Activity, Sparkles, CheckSquare, Eye, Copy, Archive, Bot, Link } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { mockApi } from '../services/mockApi';
 import { Project } from '../data/initialData';
@@ -92,7 +92,16 @@ const calculateProjectHealth = (project: Project): string => {
 };
 
 export function Projects() {
-  const { clients, setClients, addNotification, projects, setProjects, tasks, setTasks, currentUser, teamMembers, setTeamMembers } = useAppContext();
+  const clients = useAppContext(s => s.clients);
+  const setClients = useAppContext(s => s.setClients);
+  const addNotification = useAppContext(s => s.addNotification);
+  const projects = useAppContext(s => s.projects);
+  const setProjects = useAppContext(s => s.setProjects);
+  const tasks = useAppContext(s => s.tasks);
+  const setTasks = useAppContext(s => s.setTasks);
+  const currentUser = useAppContext(s => s.currentUser);
+  const teamMembers = useAppContext(s => s.teamMembers);
+  const setTeamMembers = useAppContext(s => s.setTeamMembers);
 
   const [isAssessingRisk, setIsAssessingRisk] = useState(false);
 
@@ -129,7 +138,7 @@ export function Projects() {
       
       addNotification({ type: 'success', message: 'AI risk assessment complete.' });
     } catch (error: any) {
-      addNotification({ type: 'error', message: error.message || 'AI risk assessment failed' });
+      addNotification({ type: 'error', message: (error as any).message || 'AI risk assessment failed' });
     } finally {
       setIsAssessingRisk(false);
     }
@@ -152,8 +161,8 @@ export function Projects() {
     }
   }, [projects, setProjects]);
 
-  const getMemberName = (m: any) => typeof m === 'string' ? m : m?.name || 'Unknown';
-  const getMemberNames = (team: any[]) => team.map(getMemberName);
+  const getMemberName = (m: string | { name?: string }) => typeof m === 'string' ? m : m?.name || 'Unknown';
+  const getMemberNames = (team: (string | { name?: string })[]) => team.map(getMemberName);
 
   const [viewMode, setViewMode] = useState<'grid' | 'timeline' | 'kanban'>('kanban');
   const [expandedProjects, setExpandedProjects] = useState<number[]>([]);
@@ -164,6 +173,7 @@ export function Projects() {
   const [assigneeFilter, setAssigneeFilter] = useState('All');
   
   const [openStatusDropdown, setOpenStatusDropdown] = useState<number | null>(null);
+  const [openContextMenuId, setOpenContextMenuId] = useState<number | null>(null);
   const [draggedTask, setDraggedTask] = useState<{projectId: number, taskId: number} | null>(null);
   
   // Project details modal state
@@ -180,6 +190,9 @@ export function Projects() {
   const [showCostSavingDialog, setShowCostSavingDialog] = useState(false);
   const [isGeneratingCostSaving, setIsGeneratingCostSaving] = useState(false);
   const [costSavingPlan, setCostSavingPlan] = useState('');
+  
+  const [isGeneratingClientUpdate, setIsGeneratingClientUpdate] = useState(false);
+  const [clientUpdateMarkdown, setClientUpdateMarkdown] = useState<string | null>(null);
   
   const [isUpdateHRModalOpen, setIsUpdateHRModalOpen] = useState(false);
   const [updateHROptionMember, setUpdateHROptionMember] = useState("");
@@ -467,7 +480,7 @@ export function Projects() {
     setTimeout(() => {
       const taskCount = (project.tasks || []).length;
       const completedTasks = (project.tasks || []).filter(t => t.status === 'Completed').length;
-      const totalTime = project.timeLogged || '0h';
+      const totalTime = (project as any).timeLogged || '0h';
       const activityCount = (project.activity || []).length;
       
       const newAttachment = {
@@ -489,6 +502,32 @@ export function Projects() {
       
       addNotification({ type: 'success', message: 'Summary report generated and added to attachments!' });
     }, 1500);
+  };
+
+  const generateClientUpdate = async (projectId: number) => {
+    const project = projects.find(p => p.id === projectId);
+    if (!project) return;
+    
+    setIsGeneratingClientUpdate(true);
+    addNotification({ type: 'info', message: 'Gemini is drafting your client update...' });
+    
+    try {
+      const response = await fetch('/api/generate-client-update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ project })
+      });
+      
+      if (!response.ok) throw new Error('Failed to generate update');
+      
+      const { markdownText } = await response.json();
+      setClientUpdateMarkdown(markdownText);
+      addNotification({ type: 'success', message: 'Client update drafted successfully!' });
+    } catch (error: any) {
+      addNotification({ type: 'error', message: (error as any).message || 'Failed to generate update' });
+    } finally {
+      setIsGeneratingClientUpdate(false);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -1236,7 +1275,7 @@ export function Projects() {
             type="text" 
             placeholder="Search projects..." 
             value={searchTerm}
-            onChange={(e: any) => setSearchTerm(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setSearchTerm(e.target.value)}
             className="w-full bg-[#1E2D40] border border-slate-700 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-[#0ED7A8] focus:ring-1 focus:ring-[#0ED7A8] text-white placeholder-slate-400 transition-all"
           />
         </div>
@@ -1335,9 +1374,26 @@ export function Projects() {
               <div className={`p-3 rounded-xl ${project.bg} ${project.color}`}>
                 <project.icon className="w-6 h-6" />
               </div>
-              <button onClick={(e) => { e.stopPropagation(); addNotification({ type: 'info', message: 'Context menu coming soon' }); }} className="text-slate-400 hover:text-white p-1">
-                <MoreVertical className="w-5 h-5" />
-              </button>
+              <div className="relative">
+                <button onClick={(e) => { e.stopPropagation(); setOpenContextMenuId(openContextMenuId === project.id ? null : project.id); }} className="text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-700 transition-colors">
+                  <MoreVertical className="w-5 h-5" />
+                </button>
+                {openContextMenuId === project.id && (
+                  <div className="absolute right-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden" onClick={e => e.stopPropagation()}>
+                    <div className="py-1">
+                      <button onClick={(e) => { e.stopPropagation(); setOpenContextMenuId(null); setSelectedProject(project); }} className="w-full text-left px-4 py-2 text-sm text-white hover:bg-slate-700 flex items-center gap-2">
+                         <Eye className="w-4 h-4" /> View Details
+                      </button>
+                      <button onClick={(e) => { e.stopPropagation(); setOpenContextMenuId(null); addNotification({type: 'success', message: 'Project duplicated'}); }} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-2">
+                         <Copy className="w-4 h-4" /> Duplicate
+                      </button>
+                      <button onClick={(e) => { e.stopPropagation(); setOpenContextMenuId(null); addNotification({type: 'error', message: 'Project archived'}); }} className="w-full text-left px-4 py-2 text-sm text-rose-400 hover:bg-rose-500/10 flex items-center gap-2">
+                         <Archive className="w-4 h-4" /> Archive
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             
             <div className="mb-4">
@@ -2009,6 +2065,69 @@ export function Projects() {
         </div>
       )}
 
+      {/* Client Update Modal */}
+      {clientUpdateMarkdown && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setClientUpdateMarkdown(null)} />
+          <div className="bg-[#1E2D40] rounded-2xl border border-[#0ED7A8]/30 w-full max-w-3xl relative z-10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-4 border-b border-slate-700/50 flex justify-between items-center bg-slate-800/30">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-[#0ED7A8]/10 flex items-center justify-center">
+                  <Bot className="w-4 h-4 text-[#0ED7A8]" />
+                </div>
+                <h3 className="font-semibold text-white">AI Ghostwriter: Client Update</h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const blob = new Blob([clientUpdateMarkdown], { type: 'text/markdown' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Client_Update_${new Date().toISOString().split('T')[0]}.md`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    addNotification({ type: 'success', message: 'Markdown file downloaded!' });
+                  }}
+                  className="p-2 text-slate-400 hover:text-white transition-colors bg-slate-800 rounded-lg border border-slate-700 hover:border-slate-500 flex items-center gap-2 text-xs font-medium"
+                >
+                  <Download className="w-4 h-4" /> Download .md
+                </button>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(clientUpdateMarkdown);
+                    addNotification({ type: 'success', message: 'Copied to clipboard!' });
+                  }}
+                  className="p-2 text-slate-400 hover:text-white transition-colors bg-slate-800 rounded-lg border border-slate-700 hover:border-slate-500 flex items-center gap-2 text-xs font-medium"
+                >
+                  <Copy className="w-4 h-4" /> Copy
+                </button>
+                <button onClick={() => setClientUpdateMarkdown(null)} className="p-2 text-slate-400 hover:text-white transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            <div className="p-6 overflow-y-auto custom-scrollbar">
+              <div className="prose prose-invert max-w-none text-sm text-slate-300">
+                {clientUpdateMarkdown.split('\\n').map((line, i) => (
+                  <React.Fragment key={i}>
+                    {line.startsWith('#') ? (
+                      <strong className="text-white text-base block mt-4 mb-2">{line.replace(/#/g, '')}</strong>
+                    ) : line.startsWith('-') || line.startsWith('*') ? (
+                      <li className="ml-4 mb-1">{line.substring(1).trim()}</li>
+                    ) : (
+                      <p className="mb-2">{line}</p>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Project Details Modal */}
       {selectedProject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -2043,6 +2162,29 @@ export function Projects() {
                 >
                   <FileText className="w-4 h-4" />
                   <span className="hidden sm:inline">AI Docs</span>
+                </button>
+                <button 
+                  onClick={() => {
+                    const url = `${window.location.origin}/portal/${selectedProject.id}`;
+                    navigator.clipboard.writeText(url);
+                    addNotification({ type: 'success', message: 'Magic Link copied to clipboard!' });
+                  }}
+                  className="flex items-center gap-2 text-sm text-blue-400 hover:text-white transition-colors px-3 py-1.5 hover:bg-blue-400/10 rounded-lg border border-blue-400/20"
+                >
+                  <Link className="w-4 h-4" />
+                  <span className="hidden sm:inline">Magic Link</span>
+                </button>
+                <button 
+                  onClick={() => generateClientUpdate(selectedProject.id)}
+                  disabled={isGeneratingClientUpdate}
+                  className={`flex items-center gap-2 text-sm transition-colors px-3 py-1.5 rounded-lg border ${
+                    isGeneratingClientUpdate 
+                      ? 'text-[#0ED7A8] bg-[#0ED7A8]/10 border-[#0ED7A8]/20 opacity-70 cursor-not-allowed'
+                      : 'text-[#0ED7A8] hover:text-white hover:bg-[#0ED7A8]/10 border-[#0ED7A8]/20'
+                  }`}
+                >
+                  <Bot className={`w-4 h-4 ${isGeneratingClientUpdate ? 'animate-pulse' : ''}`} />
+                  <span className="hidden sm:inline">Ghostwriter</span>
                 </button>
                 <button 
                   onClick={() => generateSummaryReport(selectedProject.id)}
@@ -2148,7 +2290,7 @@ export function Projects() {
                     <DebouncedInput 
                       type="number"
                       value={selectedProject.budget?.toString() || "0"}
-                      onChange={(e: any) => handleUpdateBudget(selectedProject.id, Number(e.target.value))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => handleUpdateBudget(selectedProject.id, Number(e.target.value))}
                       className="w-full bg-transparent border-none p-0 text-sm font-medium text-white focus:ring-0 focus:outline-none"
                     />
                   </div>
@@ -2160,7 +2302,7 @@ export function Projects() {
                     <DebouncedInput 
                       type="number"
                       value={selectedProject.spent?.toString() || "0"}
-                      onChange={(e: any) => handleUpdateSpent(selectedProject.id, Number(e.target.value))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => handleUpdateSpent(selectedProject.id, Number(e.target.value))}
                       className="w-full bg-transparent border-none p-0 text-sm font-medium text-white focus:ring-0 focus:outline-none"
                     />
                   </div>

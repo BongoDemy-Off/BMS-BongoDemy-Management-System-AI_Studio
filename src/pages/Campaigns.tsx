@@ -134,7 +134,7 @@ const initialCampaigns: Campaign[] = [
 ];
 
 export function Campaigns() {
-  const { addNotification } = useAppContext();
+  const addNotification = useAppContext(s => s.addNotification);
   const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
   const [activeTab, setActiveTab] = useState<'Active' | 'Completed'>('Active');
   
@@ -319,7 +319,7 @@ export function Campaigns() {
     setDetailsTab('outcomes');
   };
 
-  const updateOutcomes = (field: keyof Campaign['outcomes'], value: any) => {
+  const updateOutcomes = (field: keyof Campaign['outcomes'], value: string | number | boolean | any) => {
     if (!selectedCampaign) return;
     setCampaigns(prev => prev.map(c => c.id === selectedCampaign.id ? { 
       ...c, 

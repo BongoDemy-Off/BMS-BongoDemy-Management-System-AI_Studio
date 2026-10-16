@@ -1,4 +1,6 @@
 import { Task, Project } from '../context/AppContext';
+import { Client, Invoice, Expense } from '../types';
+import { supabase } from './supabase';
 
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -7,13 +9,14 @@ const STORAGE_KEY = 'bongodemy_app_state_v1';
 export interface AppState {
   tasks: Task[];
   projects: Project[];
-  clients: any[];
-  invoices: any[];
-  expenses: any[];
-  assets: any[];
-  volunteers: any[];
-  grants: any[];
-  contentCalendar: any[];
+  clients: Client[];
+  invoices: Invoice[];
+  expenses: Expense[];
+  assets: unknown[];
+  volunteers: unknown[];
+  grants: unknown[];
+  contentCalendar: unknown[];
+  reportTemplates: unknown[];
 }
 
 export const defaultState: AppState = {
@@ -25,7 +28,8 @@ export const defaultState: AppState = {
   assets: [],
   volunteers: [],
   grants: [],
-  contentCalendar: []
+  contentCalendar: [],
+  reportTemplates: []
 };
 
 function getStorage(): AppState {
@@ -44,11 +48,42 @@ function setStorage(state: AppState) {
 
 export const mockApi = {
   async getCollection<K extends keyof AppState>(key: K): Promise<AppState[K]> {
+    // If Supabase is configured, use it
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('app_state')
+          .select('value')
+          .eq('key', key)
+          .single();
+          
+        if (error) throw error;
+        if (data) return data.value as AppState[K];
+      } catch (err) {
+        console.warn(`Supabase fetch failed for ${key}, falling back to localStorage:`, err);
+      }
+    }
+    
+    // Fallback to localStorage
     await delay(300);
     return getStorage()[key];
   },
+  
   async setCollection<K extends keyof AppState>(key: K, data: AppState[K]): Promise<AppState[K]> {
-    await delay(300);
+    // If Supabase is configured, use it
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('app_state')
+          .upsert({ key, value: data }, { onConflict: 'key' });
+          
+        if (error) throw error;
+      } catch (err) {
+        console.warn(`Supabase upsert failed for ${key}, falling back to localStorage:`, err);
+      }
+    }
+
+    // Always keep localStorage in sync as a fallback
     const state = getStorage();
     state[key] = data;
     setStorage(state);

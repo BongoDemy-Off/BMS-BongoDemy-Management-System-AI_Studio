@@ -1,3 +1,4 @@
+import { Document } from '../types';
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Filter, FileText, FileImage, FileCode, Folder, MoreVertical, Download, Eye, Upload, Shield, Lock, Trash2, Edit2 } from 'lucide-react';
 import { UploadDocumentModal } from '../components/UploadDocumentModal';
@@ -30,7 +31,7 @@ export function Documents() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleUploadDocument = (newDocument: any) => {
+  const handleUploadDocument = (newDocument: Document) => {
     setDocuments([newDocument, ...documents]);
   };
 
@@ -66,11 +67,11 @@ export function Documents() {
 
   const canUpload = (roleHierarchy[viewAsRole] || 0) >= roleHierarchy['Editor'];
 
-  const canEdit = (doc: any) => {
+  const canEdit = (doc: Document) => {
     return (roleHierarchy[viewAsRole] || 0) >= roleHierarchy['Editor'];
   };
 
-  const canDelete = (doc: any) => {
+  const canDelete = (doc: Document) => {
     return (roleHierarchy[viewAsRole] || 0) >= roleHierarchy['Administrator'] || 
            (doc.author === 'Current User' && (roleHierarchy[viewAsRole] || 0) >= roleHierarchy['Editor']);
   };

@@ -7,7 +7,7 @@ export function QuickAddFab() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { addNotification } = useAppContext();
+  const addNotification = useAppContext(s => s.addNotification);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

@@ -1,45 +1,9 @@
 import React from 'react';
 import { Target, MessageSquare, Plus, FileText, CheckCircle2, DollarSign } from 'lucide-react';
-import { format, subMinutes, subHours, subDays } from 'date-fns';
+import { format } from 'date-fns';
+import { useAppContext } from '../context/AppContext';
 
-const notifications = [
-  {
-    id: 1,
-    type: 'task',
-    message: 'Md. Mudasser completed the task "Security review"',
-    time: subMinutes(new Date(), 15),
-    icon: CheckCircle2,
-    color: 'text-emerald-400',
-    bg: 'bg-emerald-400/10'
-  },
-  {
-    id: 2,
-    type: 'invoice',
-    message: 'Invoice INV-2026-041 was paid by TechCorp ($4,500)',
-    time: subHours(new Date(), 2),
-    icon: DollarSign,
-    color: 'text-[#0ED7A8]',
-    bg: 'bg-[#0ED7A8]/10'
-  },
-  {
-    id: 3,
-    type: 'lead',
-    message: 'New Lead: Alice Security requested a VAPT quote.',
-    time: subHours(new Date(), 5),
-    icon: Target,
-    color: 'text-amber-400',
-    bg: 'bg-amber-400/10'
-  },
-  {
-    id: 4,
-    type: 'document',
-    message: 'New pentest report uploaded for FinServe LLC.',
-    time: subDays(new Date(), 1),
-    icon: FileText,
-    color: 'text-blue-400',
-    bg: 'bg-blue-400/10'
-  }
-];
+
 
 interface NotificationPanelProps {
   isOpen: boolean;
@@ -47,6 +11,10 @@ interface NotificationPanelProps {
 }
 
 export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
+  const notifications = useAppContext(s => s.notifications);
+  const markAllNotificationsRead = useAppContext(s => s.markAllNotificationsRead);
+  const markNotificationRead = useAppContext(s => s.markNotificationRead);
+
   if (!isOpen) return null;
 
   return (
@@ -55,7 +23,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
         <h3 className="font-semibold text-white">Activity Stream</h3>
         <button 
            className="text-xs text-[#0ED7A8] hover:text-[#0ED7A8]/80 font-medium transition-colors"
-           onClick={onClose}
+           onClick={() => { markAllNotificationsRead(); onClose(); }}
         >
            Mark all as read
         </button>
@@ -69,12 +37,15 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
           <div className="divide-y divide-slate-700/50">
             {notifications.map((notif) => (
               <div key={notif.id} className="p-4 hover:bg-slate-800/50 transition-colors flex gap-4 items-start">
-                 <div className={`w-8 h-8 rounded-full ${notif.bg} flex items-center justify-center shrink-0`}>
-                    <notif.icon className={`w-4 h-4 ${notif.color}`} />
+                 <div className={`w-8 h-8 rounded-full ${(notif.type === 'success' ? 'bg-emerald-400/10' : notif.type === 'error' ? 'bg-rose-400/10' : notif.type === 'warning' ? 'bg-amber-400/10' : 'bg-blue-400/10')} flex items-center justify-center shrink-0`}>
+                {(() => {
+                   const Icon = notif.type === 'success' ? CheckCircle2 : notif.type === 'error' ? Plus : notif.type === 'warning' ? Target : MessageSquare;
+                   return <Icon className={`w-4 h-4 ${notif.type === 'success' ? 'text-emerald-400' : notif.type === 'error' ? 'text-rose-400' : notif.type === 'warning' ? 'text-amber-400' : 'text-blue-400'}`} />;
+                 })()}
                  </div>
                  <div className="flex-1 min-w-0">
                     <p className="text-sm text-slate-200 leading-snug">{notif.message}</p>
-                    <p className="text-xs text-slate-500 mt-1">{format(notif.time, 'MMM d, h:mm a')}</p>
+                    <p className="text-xs text-slate-500 mt-1">{format(new Date(notif.createdAt), 'MMM d, h:mm a')}</p>
                  </div>
               </div>
             ))}

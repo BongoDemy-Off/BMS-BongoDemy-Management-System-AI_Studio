@@ -3,7 +3,8 @@ import { Target, Building2, User, Phone, Mail, FileText, CheckCircle2 } from 'lu
 import { useAppContext } from '../context/AppContext';
 
 export function LeadCapture() {
-  const { leads, setLeads } = useAppContext();
+  const leads = useAppContext(s => s.leads);
+  const setLeads = useAppContext(s => s.setLeads);
   const [formData, setFormData] = useState({
     name: '',
     company: '',

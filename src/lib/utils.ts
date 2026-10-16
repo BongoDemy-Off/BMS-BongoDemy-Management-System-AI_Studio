@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function exportToCSV(data: any[], filename: string) {
+export function exportToCSV<T extends Record<string, unknown>>(data: T[], filename: string) {
   if (!data || !data.length) return;
   const fileType = 'text/csv;charset=utf-8;';
   const csvData = [];
@@ -16,8 +16,8 @@ export function exportToCSV(data: any[], filename: string) {
     const row = headers.map(header => {
        let cell = item[header] === null || item[header] === undefined ? '' : item[header];
        cell = typeof cell === 'object' ? JSON.stringify(cell) : String(cell);
-       cell = cell.replace(/"/g, '""');
-       if (cell.search(/("|,|\n)/g) >= 0) {
+       cell = String(cell).replace(/"/g, '""');
+       if (String(cell).search(/("|,|\n)/g) >= 0) {
            cell = `"${cell}"`;
        }
        return cell;

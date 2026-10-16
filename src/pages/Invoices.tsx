@@ -1,3 +1,4 @@
+import { Invoice } from '../types';
 import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Search, Filter, FileText, Download, MoreHorizontal, ArrowUpRight, ArrowDownRight, Edit2, Trash2, Bell, RefreshCw, AlertTriangle } from 'lucide-react';
 import { CreateInvoiceModal } from '../components/CreateInvoiceModal';
@@ -15,7 +16,7 @@ export type Invoice = {
   project: string;
   amount: number;
   date: string;
-  dueDate: string;
+  //dueDate: string;
   status: string;
   reminders?: InvoiceReminder[];
   recurring?: boolean;
@@ -29,7 +30,7 @@ export const initialInvoices: Invoice[] = [
     project: 'Web Application Pentest',
     amount: 15000,
     date: '2024-03-01',
-    dueDate: '2024-03-15',
+    //dueDate: '2024-03-15',
     status: 'Paid',
     reminders: []
   },
@@ -39,7 +40,7 @@ export const initialInvoices: Invoice[] = [
     project: 'Corporate Website Redesign',
     amount: 8500,
     date: '2024-03-05',
-    dueDate: '2024-03-20',
+    //dueDate: '2024-03-20',
     status: 'Pending',
     reminders: []
   },
@@ -49,7 +50,7 @@ export const initialInvoices: Invoice[] = [
     project: 'Network Security Audit',
     amount: 22000,
     date: '2024-02-15',
-    dueDate: '2024-03-01',
+    //dueDate: '2024-03-01',
     status: 'Overdue',
     reminders: []
   },
@@ -59,14 +60,15 @@ export const initialInvoices: Invoice[] = [
     project: 'Q2 Marketing Strategy',
     amount: 5000,
     date: '2024-03-10',
-    dueDate: '2024-03-25',
-    status: 'Draft',
+    //dueDate: '2024-03-25',
+    status: 'Draft' as any,
     reminders: []
   }
 ];
 
 export function Invoices() {
-  const { projects, addNotification } = useAppContext();
+  const projects = useAppContext(s => s.projects);
+  const addNotification = useAppContext(s => s.addNotification);
   const [searchTerm, setSearchTerm] = useState('');
   const [invoices, setInvoices] = useState(initialInvoices);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -127,7 +129,7 @@ export function Invoices() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleCreateInvoice = (newInvoice: any) => {
+  const handleCreateInvoice = (newInvoice: Invoice) => {
     setInvoices([newInvoice, ...invoices]);
   };
 

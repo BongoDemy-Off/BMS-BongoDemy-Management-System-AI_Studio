@@ -1,16 +1,52 @@
+import { TeamMember } from '../types';
 import React, { useState } from 'react';
-import { Search, Filter, MoreHorizontal, UserCog, DollarSign, ShieldCheck, Mail, Phone, X, Shield, Eye, EyeOff, Clock, CheckCircle2, XCircle, Plus, Edit2, Trash2, Sparkles } from 'lucide-react';
+import { Search, Filter, MoreHorizontal, UserCog, DollarSign, ShieldCheck, Mail, Phone, X, Shield, Eye, EyeOff, Clock, CheckCircle2, XCircle, Plus, Edit2, Trash2, Sparkles, Download, Copy } from 'lucide-react';
 import { useAppContext, permissionCategories } from '../context/AppContext';
 
 export function HR() {
-  const { teamMembers, setTeamMembers, roles: availableRoles, setRoles, rolePermissions, setRolePermissions, addNotification, projects } = useAppContext();
+  const teamMembers = useAppContext(s => s.teamMembers);
+  const setTeamMembers = useAppContext(s => s.setTeamMembers);
+  const availableRoles = useAppContext(s => s.roles);
+  const setRoles = useAppContext(s => s.setRoles);
+  const rolePermissions = useAppContext(s => s.rolePermissions);
+  const setRolePermissions = useAppContext(s => s.setRolePermissions);
+  const addNotification = useAppContext(s => s.addNotification);
+  const projects = useAppContext(s => s.projects);
   const [searchTerm, setSearchTerm] = useState('');
   const [skillsSearchTerm, setSkillsSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'directory' | 'leave' | 'logs' | 'recruitment' | 'performance' | 'onboarding' | 'roles' | 'skills'>('directory');
   const [filterType, setFilterType] = useState('all');
 
+  const [isGeneratingDossier, setIsGeneratingDossier] = useState(false);
+  const [dossierMarkdown, setDossierMarkdown] = useState<string | null>(null);
+
   const [isAnalyzingGaps, setIsAnalyzingGaps] = useState(false);
   const [skillGapAnalysis, setSkillGapAnalysis] = useState<{analysis: string, recommendations: string[]} | null>(null);
+
+  const handleAIGenerateDossier = async (member: TeamMember) => {
+    setIsGeneratingDossier(true);
+    addNotification({ type: 'info', message: `Gemini is generating dossier for ${member.name}...` });
+    
+    const memberTasks = projects.flatMap(p => (p.tasks || []).filter(t => t.assignee === member.name));
+
+    try {
+      const response = await fetch('/api/generate-team-dossier', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ member, tasks: memberTasks })
+      });
+      
+      if (!response.ok) throw new Error('Failed to generate dossier');
+      
+      const { markdownText } = await response.json();
+      setDossierMarkdown(markdownText);
+      addNotification({ type: 'success', message: 'Team Dossier generated successfully!' });
+    } catch (error: any) {
+      addNotification({ type: 'error', message: (error as any).message || 'AI dossier generation failed' });
+    } finally {
+      setIsGeneratingDossier(false);
+    }
+  };
 
   const handleAIAnalyzeSkillGaps = async () => {
     setIsAnalyzingGaps(true);
@@ -29,7 +65,7 @@ export function HR() {
       setSkillGapAnalysis(result);
       addNotification({ type: 'success', message: 'Skill gap analysis complete.' });
     } catch (error: any) {
-      addNotification({ type: 'error', message: error.message || 'AI skill analysis failed' });
+      addNotification({ type: 'error', message: (error as any).message || 'AI skill analysis failed' });
     } finally {
       setIsAnalyzingGaps(false);
     }
@@ -41,7 +77,7 @@ export function HR() {
   // Modal state
   const [isAccessModalOpen, setIsAccessModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<any | null>(null);
+  const [selectedMember, setSelectedMember] = useState<any>(null);
   const [selectedRole, setSelectedRole] = useState('');
 
   // New member form state
@@ -67,7 +103,7 @@ export function HR() {
 
   // Work Log State
   const [isWorkLogModalOpen, setIsWorkLogModalOpen] = useState(false);
-  const [memberForWorkLog, setMemberForWorkLog] = useState<any | null>(null);
+  const [memberForWorkLog, setMemberForWorkLog] = useState<any>(null);
   const [newWorkLog, setNewWorkLog] = useState({ startTime: '', endTime: '', description: '' });
 
   // Recruitment State
@@ -236,7 +272,7 @@ export function HR() {
     }
   };
 
-  const openAccessModal = (member: any) => {
+  const openAccessModal = (member: TeamMember) => {
     setSelectedMember(member);
     const matchedRole = availableRoles.find(r => r.name === member.accessLevel);
     setSelectedRole(matchedRole ? matchedRole.id : 'viewer');
@@ -556,6 +592,19 @@ export function HR() {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-2">
+                      <button 
+                        onClick={() => handleAIGenerateDossier(member)}
+                        disabled={isGeneratingDossier}
+                        className={`p-2 transition-colors rounded-lg flex items-center gap-1 ${
+                          isGeneratingDossier 
+                            ? 'text-purple-400 bg-purple-400/10 opacity-70 cursor-not-allowed'
+                            : 'text-slate-400 hover:text-purple-400 hover:bg-purple-400/10'
+                        }`}
+                        title="Generate AI Dossier"
+                      >
+                        <Sparkles className={`w-4 h-4 ${isGeneratingDossier ? 'animate-pulse' : ''}`} />
+                        <span className="text-xs font-medium hidden sm:inline-block">Dossier</span>
+                      </button>
                       <button 
                         onClick={() => openAccessModal(member)}
                         className="p-2 text-slate-400 hover:text-[#0ED7A8] transition-colors rounded-lg hover:bg-slate-800 flex items-center gap-1"
@@ -1525,6 +1574,69 @@ export function HR() {
                 <button type="submit" className="bg-[#0ED7A8] hover:bg-[#0ED7A8]/90 text-slate-900 px-6 py-2 rounded-lg text-sm font-medium transition-colors">Save</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Dossier Modal */}
+      {dossierMarkdown && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setDossierMarkdown(null)} />
+          <div className="bg-[#1E2D40] rounded-2xl border border-purple-500/30 w-full max-w-3xl relative z-10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-4 border-b border-slate-700/50 flex justify-between items-center bg-slate-800/30">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-purple-400" />
+                </div>
+                <h3 className="font-semibold text-white">AI Team Impact Dossier</h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const blob = new Blob([dossierMarkdown], { type: 'text/markdown' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Impact_Dossier_${new Date().toISOString().split('T')[0]}.md`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    addNotification({ type: 'success', message: 'Dossier downloaded!' });
+                  }}
+                  className="p-2 text-slate-400 hover:text-white transition-colors bg-slate-800 rounded-lg border border-slate-700 hover:border-slate-500 flex items-center gap-2 text-xs font-medium"
+                >
+                  <Download className="w-4 h-4" /> Download .md
+                </button>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(dossierMarkdown);
+                    addNotification({ type: 'success', message: 'Copied to clipboard!' });
+                  }}
+                  className="p-2 text-slate-400 hover:text-white transition-colors bg-slate-800 rounded-lg border border-slate-700 hover:border-slate-500 flex items-center gap-2 text-xs font-medium"
+                >
+                  <Copy className="w-4 h-4" /> Copy
+                </button>
+                <button onClick={() => setDossierMarkdown(null)} className="p-2 text-slate-400 hover:text-white transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            <div className="p-6 overflow-y-auto custom-scrollbar">
+              <div className="prose prose-invert max-w-none text-sm text-slate-300">
+                {dossierMarkdown.split('\n').map((line, i) => (
+                  <React.Fragment key={i}>
+                    {line.startsWith('#') ? (
+                      <strong className="text-white text-base block mt-4 mb-2">{line.replace(/#/g, '')}</strong>
+                    ) : line.startsWith('-') || line.startsWith('*') ? (
+                      <li className="ml-4 mb-1">{line.substring(1).trim()}</li>
+                    ) : (
+                      <p className="mb-2">{line}</p>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}

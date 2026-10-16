@@ -42,7 +42,7 @@ const victimCasesData = [
 
 const caseColors = ['#0ED7A8', '#3b82f6', '#f59e0b', '#ec4899'];
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: { active?: boolean, payload?: any[], label?: string }) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-slate-800 border border-slate-700 p-3 rounded-xl shadow-2xl backdrop-blur-sm">
@@ -60,7 +60,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function Analytics() {
-  const { leads, teamMembers, addNotification } = useAppContext();
+  const leads = useAppContext(s => s.leads);
+  const teamMembers = useAppContext(s => s.teamMembers);
+  const addNotification = useAppContext(s => s.addNotification);
   const [timeRange, setTimeRange] = useState<'3M' | '6M' | '1Y'>('6M');
 
   // Filter Data based on time range

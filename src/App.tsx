@@ -33,17 +33,20 @@ import { Grants } from './pages/Grants';
 import { LeadCapture } from './pages/LeadCapture';
 import { Login } from './pages/Login';
 import { ClientPortal } from './pages/ClientPortal';
+import { PublicClientPortal } from './pages/PublicClientPortal';
 import { AppProvider, useAppContext } from './context/AppContext';
 
 function AppRouter() {
-  const { currentUser } = useAppContext();
+  const currentUser = useAppContext(s => s.currentUser);
 
   if (!currentUser) {
     return (
       <BrowserRouter>
         <Routes>
           <Route path="/lead-capture" element={<LeadCapture />} />
+        <Route path="/portal/:projectId" element={<PublicClientPortal />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/portal/:projectId" element={<PublicClientPortal />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>
@@ -56,6 +59,7 @@ function AppRouter() {
         <Routes>
           <Route path="/login" element={<Navigate to="/" replace />} />
           <Route path="/" element={<ClientPortal />} />
+          <Route path="/portal/:projectId" element={<PublicClientPortal />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

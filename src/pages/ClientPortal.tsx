@@ -1,6 +1,8 @@
+import { ClientNotification } from '../types';
 import React, { useState } from 'react';
 import { Target, Search, FileText, Briefcase, CheckSquare, DollarSign, LogOut, Bell, LayoutDashboard, CreditCard, Folder, Users, MessageSquare, Settings } from 'lucide-react';
-import { useAppContext, Deal, DealPhase } from '../context/AppContext';
+import { useAppContext } from '../context/AppContext';
+import { Deal, DealPhase } from '../types';
 
 const ProjectDetailsCard: React.FC<{ deal: Deal }> = ({ deal }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -304,9 +306,24 @@ const ProjectDetailsCard: React.FC<{ deal: Deal }> = ({ deal }) => {
 }
 
 export function ClientPortal() {
-  const { clients, currentUser, logout, projects, addNotification } = useAppContext();
+  const clients = useAppContext(s => s.clients);
+  const currentUser = useAppContext(s => s.currentUser);
+  const logout = useAppContext(s => s.logout);
+  const projects = useAppContext(s => s.projects);
+  const addNotification = useAppContext(s => s.addNotification);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'projects' | 'tasks' | 'finances' | 'files' | 'support' | 'settings' | 'notifications'>('dashboard');
-  const [showNotificationsDropdown, setShowNotificationsDropdown] = useState(false);
+  const [showClientNotificationsDropdown, setShowClientNotificationsDropdown] = useState(false);
+  
+  // Modals state
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [ticketSubject, setTicketSubject] = useState('');
+  const [ticketDesc, setTicketDesc] = useState('');
+  const [msgContent, setMsgContent] = useState('');
+  const [scheduleDate, setScheduleDate] = useState('');
   
   const [driveFolderLink, setDriveFolderLink] = useState('');
   const [driveFolderName, setDriveFolderName] = useState('');
@@ -345,7 +362,7 @@ export function ClientPortal() {
   };
 
   const notifications = client.notifications;
-  const unreadCount = notifications.filter((n: any) => !n.read).length;
+  const unreadCount = notifications.filter((n: ClientNotification) => !n.read).length;
 
   const handleDriveSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -422,7 +439,7 @@ export function ClientPortal() {
                         <h4 className="text-white font-medium mb-1">Approve Phase 2 Wireframes</h4>
                         <p className="text-sm text-slate-400">Please review the updated wireframes so we can begin UI design.</p>
                       </div>
-                      <button onClick={() => addNotification({ type: 'info', message: 'Review feature coming soon.' })} className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Review</button>
+                      <button onClick={() => setIsReviewModalOpen(true)} className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Review</button>
                     </div>
                   </div>
                 </div>
@@ -465,10 +482,10 @@ export function ClientPortal() {
                         <p className="text-xs text-indigo-300">Lead Project Manager</p>
                       </div>
                     </div>
-                    <button onClick={() => addNotification({ type: 'info', message: 'Scheduling system coming soon.' })} className="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-indigo-500/20 transition-colors">
+                    <button onClick={() => setIsScheduleModalOpen(true)} className="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-indigo-500/20 transition-colors">
                       Schedule a Call
                     </button>
-                    <button onClick={() => addNotification({ type: 'info', message: 'Messaging system coming soon.' })} className="w-full bg-slate-800 hover:bg-slate-700 text-white py-2.5 rounded-xl text-sm font-medium transition-colors border border-slate-700">
+                    <button onClick={() => setIsMessageModalOpen(true)} className="w-full bg-slate-800 hover:bg-slate-700 text-white py-2.5 rounded-xl text-sm font-medium transition-colors border border-slate-700">
                       Send Message
                     </button>
                   </div>
@@ -581,7 +598,7 @@ export function ClientPortal() {
                    <button onClick={() => addNotification({ type: 'success', message: 'Downloading PDF invoice...' })} className="bg-slate-800 hover:bg-slate-700 border border-slate-600 px-4 py-2 text-white rounded-lg transition-colors font-medium text-sm flex items-center justify-center gap-2">
                      <FileText className="w-4 h-4" /> PDF
                    </button>
-                   <button onClick={() => addNotification({ type: 'info', message: 'Payment gateway integration coming soon.' })} className="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded-lg transition-colors font-medium text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20">
+                   <button onClick={() => setIsPaymentModalOpen(true)} className="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded-lg transition-colors font-medium text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20">
                      <DollarSign className="w-4 h-4" /> Pay Now
                    </button>
                  </div>
@@ -719,7 +736,7 @@ export function ClientPortal() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-white">Support Tickets</h2>
-              <button onClick={() => addNotification({ type: 'info', message: 'Ticket creation coming soon.' })} className="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
+              <button onClick={() => setIsTicketModalOpen(true)} className="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
                 <MessageSquare className="w-4 h-4" /> New Ticket
               </button>
             </div>
@@ -787,7 +804,7 @@ export function ClientPortal() {
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white">Notifications</h2>
+              <h2 className="text-2xl font-bold text-white">ClientNotifications</h2>
             </div>
             
             <div className="space-y-4">
@@ -798,7 +815,7 @@ export function ClientPortal() {
                   <p className="text-slate-400 text-sm">You'll receive updates about your projects and account here.</p>
                 </div>
               ) : (
-                notifications.map((notif: any) => (
+                notifications.map((notif: ClientNotification) => (
                   <div key={notif.id} className={`p-5 rounded-xl border transition-colors ${!notif.read ? 'bg-[#1E2D40] hover:bg-slate-800 border-indigo-500/30 shadow-sm shadow-indigo-500/10' : 'bg-slate-800/40 border-slate-700/50'}`}>
                     <div className="flex items-start justify-between gap-4">
                       <div>
@@ -844,7 +861,7 @@ export function ClientPortal() {
             { id: 'tasks', icon: CheckSquare, label: 'Tasks' },
             { id: 'finances', icon: DollarSign, label: 'Finances' },
             { id: 'files', icon: Folder, label: 'Files' },
-            { id: 'notifications', icon: Bell, label: 'Notifications' },
+            { id: 'notifications', icon: Bell, label: 'ClientNotifications' },
             { id: 'support', icon: MessageSquare, label: 'Support' },
             { id: 'settings', icon: Settings, label: 'Settings' }
           ].map((item) => (
@@ -921,6 +938,167 @@ export function ClientPortal() {
           Chat with us
         </span>
       </a>
+
+      {/* Modals */}
+      {isScheduleModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1E2D40] rounded-2xl border border-slate-700 w-full max-w-md overflow-hidden">
+            <div className="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
+              <h3 className="text-xl font-bold text-white">Schedule a Call</h3>
+              <button onClick={() => setIsScheduleModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              addNotification({ type: 'success', message: 'Call scheduled successfully!' });
+              setIsScheduleModalOpen(false);
+            }} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">Select Date & Time</label>
+                <input type="datetime-local" required value={scheduleDate} onChange={e => setScheduleDate(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">Topic</label>
+                <input type="text" placeholder="e.g. Project kickoff" className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+              </div>
+              <button type="submit" className="w-full bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/20 transition-colors">
+                Confirm Booking
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isMessageModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1E2D40] rounded-2xl border border-slate-700 w-full max-w-md overflow-hidden">
+            <div className="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
+              <h3 className="text-xl font-bold text-white">Send Message</h3>
+              <button onClick={() => setIsMessageModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              addNotification({ type: 'success', message: 'Message sent!' });
+              setMsgContent('');
+              setIsMessageModalOpen(false);
+            }} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">Message Content</label>
+                <textarea rows={4} required value={msgContent} onChange={e => setMsgContent(e.target.value)} placeholder="Type your message here..." className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
+              </div>
+              <button type="submit" className="w-full bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/20 transition-colors">
+                Send Message
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isPaymentModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1E2D40] rounded-2xl border border-slate-700 w-full max-w-md overflow-hidden">
+            <div className="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
+              <h3 className="text-xl font-bold text-white flex items-center gap-2"><CreditCard className="w-5 h-5"/> Secure Payment</h3>
+              <button onClick={() => setIsPaymentModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              addNotification({ type: 'success', message: 'Payment processed successfully!' });
+              setIsPaymentModalOpen(false);
+            }} className="p-6 space-y-4">
+              <div className="bg-slate-800/50 p-4 rounded-xl mb-4 border border-slate-700">
+                <p className="text-slate-400 text-sm">Amount due:</p>
+                <p className="text-white text-2xl font-bold">$15,000.00</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">Card Number</label>
+                <input type="text" required placeholder="0000 0000 0000 0000" className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Expiry Date</label>
+                  <input type="text" required placeholder="MM/YY" className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">CVC</label>
+                  <input type="text" required placeholder="123" className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+                </div>
+              </div>
+              <button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-emerald-500/20 transition-colors mt-4">
+                Pay $15,000.00
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isTicketModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1E2D40] rounded-2xl border border-slate-700 w-full max-w-md overflow-hidden">
+            <div className="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
+              <h3 className="text-xl font-bold text-white">Create Support Ticket</h3>
+              <button onClick={() => setIsTicketModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              addNotification({ type: 'success', message: 'Support ticket submitted!' });
+              setTicketSubject('');
+              setTicketDesc('');
+              setIsTicketModalOpen(false);
+            }} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">Subject</label>
+                <input type="text" required value={ticketSubject} onChange={e => setTicketSubject(e.target.value)} placeholder="e.g. Issue with billing" className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">Description</label>
+                <textarea rows={4} required value={ticketDesc} onChange={e => setTicketDesc(e.target.value)} placeholder="Explain your issue in detail..." className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
+              </div>
+              <button type="submit" className="w-full bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/20 transition-colors">
+                Submit Ticket
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isReviewModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1E2D40] rounded-2xl border border-slate-700 w-full max-w-lg overflow-hidden">
+            <div className="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
+              <h3 className="text-xl font-bold text-white">Review Documents</h3>
+              <button onClick={() => setIsReviewModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="p-4 border border-slate-700 rounded-xl bg-slate-800/30 flex items-start gap-4">
+                <FileText className="w-8 h-8 text-indigo-400 shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium mb-1">Phase 2 Wireframes.pdf</h4>
+                  <p className="text-sm text-slate-400">Please review the updated wireframes for the dashboard.</p>
+                  <a href="#" className="inline-block mt-3 text-indigo-400 hover:text-indigo-300 text-sm font-medium">View Document &rarr;</a>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4">
+                <button onClick={() => { setIsReviewModalOpen(false); addNotification({ type: 'success', message: 'Changes requested.' }); }} className="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-600">
+                  Request Changes
+                </button>
+                <button onClick={() => { setIsReviewModalOpen(false); addNotification({ type: 'success', message: 'Document approved!' }); }} className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-emerald-500/20">
+                  Approve Document
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

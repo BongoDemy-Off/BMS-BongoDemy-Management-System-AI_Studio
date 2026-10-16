@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Plus, Calendar, Clock, Users, Building, Shield, Star, FileText, CheckSquare, Square, ChevronRight, X, AlertCircle, CheckCircle2, MessageSquare, ListTodo, Save, Bell } from 'lucide-react';
+import { Plus, Calendar, Clock, Users, Building, Shield, Star, FileText, CheckSquare, Square, ChevronRight, X, AlertCircle, CheckCircle2, MessageSquare, ListTodo, Save, Bell, Sparkles } from 'lucide-react';
 import { format, parseISO, isPast, isFuture } from 'date-fns';
 
 type PrepItem = { id: string; task: string; completed: boolean };
@@ -76,7 +76,7 @@ const initialMeetings: Meeting[] = [
 ];
 
 export function Meetings() {
-  const { addNotification } = useAppContext();
+  const addNotification = useAppContext(s => s.addNotification);
   const [meetings, setMeetings] = useState<Meeting[]>(initialMeetings);
   const [activeTab, setActiveTab] = useState<'Upcoming' | 'Past' | 'Calendar'>('Upcoming');
   
@@ -268,7 +268,7 @@ export function Meetings() {
       
       addNotification({ type: 'success', message: 'Notes summarized and action items extracted.' });
     } catch (error: any) {
-      addNotification({ type: 'error', message: error.message || 'AI summarization failed' });
+      addNotification({ type: 'error', message: (error as any).message || 'AI summarization failed' });
     } finally {
       setIsSummarizing(false);
     }

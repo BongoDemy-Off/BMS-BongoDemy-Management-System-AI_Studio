@@ -1,3 +1,4 @@
+import { Expense } from '../types';
 import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Search, Filter, DollarSign, TrendingUp, CreditCard, Receipt, MoreHorizontal, CheckCircle2, Clock, XCircle, PieChart as PieChartIcon, Download, Edit2, Trash2, RefreshCw, Bell } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
@@ -23,7 +24,7 @@ const categoryData = [
 ];
 
 export function Expense() {
-  const { addNotification } = useAppContext();
+  const addNotification = useAppContext(s => s.addNotification);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -51,7 +52,7 @@ export function Expense() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleRecordExpense = (newExpense: any) => {
+  const handleRecordExpense = (newExpense: Expense) => {
     if (editingExpense) {
       setExpenses(prev => prev.map(exp => exp.id === newExpense.id ? newExpense : exp));
       setEditingExpense(null);
@@ -87,7 +88,7 @@ export function Expense() {
   const handleRemoveReminder = (expenseId: string, reminderId: number) => {
     setExpenses(prev => prev.map(exp => {
        if (exp.id === expenseId) {
-         return { ...exp, reminders: (exp.reminders || []).filter((r: any) => r.id !== reminderId) };
+         return { ...exp, reminders: (exp.reminders || []).filter((r: { id: string; date: string; note: string }) => r.id !== reminderId) };
        }
        return exp;
     }));
@@ -379,7 +380,7 @@ export function Expense() {
                     </div>
                     {expense.reminders && expense.reminders.length > 0 && (
                        <div className="flex flex-wrap gap-1 mt-1.5">
-                         {expense.reminders.map((rem: any) => (
+                         {expense.reminders.map((rem: { id: string; date: string; note: string }) => (
                            <span key={rem.id} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-400/10 text-amber-400 border border-amber-400/20">
                              <Bell className="w-2.5 h-2.5" />
                              {rem.calculatedTime} ({rem.type})

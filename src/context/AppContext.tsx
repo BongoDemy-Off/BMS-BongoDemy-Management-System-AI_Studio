@@ -1,151 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 
-export type Role = {
-  id: string;
-  name: string;
-  description: string;
-  isCustom: boolean;
-};
-
-export type PermissionCategory = {
-  name: string;
-  permissions: { id: string; name: string }[];
-};
-
-export type TeamMember = {
-  id: string;
-  name: string;
-  role: string;
-  department: string;
-  type: string;
-  compensation: {
-    amount: number;
-    period: string;
-    currency: string;
-  };
-  accessLevel: string;
-  status: string;
-  email: string;
-  attendanceStatus: 'checked-in' | 'checked-out' | 'absent';
-  checkInTime?: string;
-  checkOutTime?: string;
-  skills?: { name: string; level: 'Novice' | 'Intermediate' | 'Expert' }[];
-  certifications?: string[];
-  workLogs?: {
-    id: string;
-    date: string;
-    startTime: string;
-    endTime: string;
-    description: string;
-  }[];
-};
-
-export type Notification = {
-  id: string;
-  message: string;
-  type: 'info' | 'warning' | 'success';
-  createdAt: string;
-  read: boolean;
-};
-
-export type UserPreferences = {
-  defaultTaskView: 'list' | 'kanban';
-  defaultTaskSort: 'none' | 'desc' | 'asc';
-};
-
-export type LeadActivity = {
-  id: number | string;
-  type: string;
-  date: string;
-  description: string;
-};
-
-export type Lead = {
-  id: number | string;
-  name: string;
-  company: string;
-  contact: string;
-  phone: string;
-  stage: string;
-  value: number;
-  probability: number;
-  lastContact: string;
-  assignee: string;
-  activities: LeadActivity[];
-};
-
-export type ClientContact = {
-  id: number | string;
-  name: string;
-  role: string;
-  email: string;
-  phone: string;
-};
-
-export type ClientActivity = {
-  id: number | string;
-  type: string;
-  date: string;
-  description: string;
-};
-
-export type DealPhase = {
-  name: string;
-  status: string;
-  startDate?: string;
-  estimatedDelivery?: string;
-  date?: string;
-};
-
-export type Deal = {
-  id: number | string;
-  name: string;
-  value: string;
-  stage: string;
-  probability: number;
-  startDate?: string;
-  deliveryDate?: string;
-  driveLink?: string;
-  targetClientName?: string;
-  phases: DealPhase[];
-};
-
-export type ClientNotification = {
-  id: string;
-  type: 'project_update' | 'delivery' | 'meeting' | 'payment' | 'general';
-  title: string;
-  message: string;
-  date: string;
-  read: boolean;
-  channels: ('system' | 'email' | 'whatsapp')[];
-};
-
-export type Client = {
-  id: number | string;
-  name: string;
-  type?: 'Standard' | 'Premium' | 'Elite' | string;
-  contact: string;
-  email: string;
-  password?: string;
-  phone: string;
-  location: string;
-  status: string;
-  projects: number;
-  totalBilled: string;
-  about: string;
-  contacts: ClientContact[];
-  activities: ClientActivity[];
-  deals: Deal[];
-  notifications?: ClientNotification[];
-};
-
-export type CurrentUser = {
-  id: string;
-  email: string;
-  role: 'admin' | 'client';
-  clientId?: number | string;
-};
-
+import { Role, PermissionCategory, TeamMember, Notification, UserPreferences, Lead, Client, CurrentUser, ReportTemplate } from '../types';
 import { initialTasks, initialProjects, Task, Project } from '../data/initialData';
 
 export type { Task, Project };
@@ -174,6 +29,8 @@ type AppContextType = {
   setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
   tasks: Task[];
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  reportTemplates: ReportTemplate[];
+  setReportTemplates: React.Dispatch<React.SetStateAction<ReportTemplate[]>>;
 };
 
 const initialRoles: Role[] = [
@@ -455,33 +312,36 @@ const initialClients: Client[] = [
   }
 ];
 
-const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function AppProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>({ id: 'admin', email: 'admin@bongodemy.com', role: 'admin' });
-  const [clients, setClients] = useState<Client[]>(initialClients);
+import { create } from 'zustand';
 
-  const login = (email: string, pass: string) => {
+export const useAppStore = create<AppContextType>((set, get) => ({
+  currentUser: { id: 'admin', email: 'admin@bongodemy.com', role: 'admin' },
+  login: (email, pass) => {
+    const { clients } = get();
     if (email === 'admin@bongodemy.com' && pass === 'admin') {
-      setCurrentUser({ id: 'admin', email, role: 'admin' });
+      set({ currentUser: { id: 'admin', email, role: 'admin' } });
       return;
     }
     const client = clients.find(c => c.email.toLowerCase() === email.toLowerCase() && c.password === pass);
     if (client) {
-      setCurrentUser({ id: String(client.id), email: client.email, role: 'client', clientId: client.id });
+      set({ currentUser: { id: String(client.id), email: client.email, role: 'client', clientId: client.id } });
     } else {
       throw new Error('Invalid email or password');
     }
-  };
+  },
+  logout: () => set({ currentUser: null }),
 
-  const logout = () => {
-    setCurrentUser(null);
-  };
+  roles: initialRoles,
+  setRoles: (val) => set(state => ({ roles: typeof val === 'function' ? val(state.roles) : val })),
 
-  const [roles, setRoles] = useState<Role[]>(initialRoles);
-  const [rolePermissions, setRolePermissions] = useState<Record<string, string[]>>(initialRolePermissions);
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
-  const [notifications, setNotifications] = useState<Notification[]>([
+  rolePermissions: initialRolePermissions,
+  setRolePermissions: (val) => set(state => ({ rolePermissions: typeof val === 'function' ? val(state.rolePermissions) : val })),
+
+  teamMembers: initialTeamMembers,
+  setTeamMembers: (val) => set(state => ({ teamMembers: typeof val === 'function' ? val(state.teamMembers) : val })),
+
+  notifications: [
     {
       id: 'noti-1',
       message: 'System maintenance scheduled for tonight at 12 AM.',
@@ -489,16 +349,106 @@ export function AppProvider({ children }: { children: ReactNode }) {
       createdAt: new Date().toISOString(),
       read: false
     }
-  ]);
+  ],
+  addNotification: (notification) => set(state => ({
+    notifications: [
+      {
+        ...notification,
+        id: `noti-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        read: false
+      },
+      ...state.notifications
+    ]
+  })),
+  markNotificationRead: (id) => set(state => ({
+    notifications: state.notifications.map(n => n.id === id ? { ...n, read: true } : n)
+  })),
+  markAllNotificationsRead: () => set(state => ({
+    notifications: state.notifications.map(n => ({ ...n, read: true }))
+  })),
 
-  const [userPreferences, setUserPreferences] = useState<UserPreferences>({
+  userPreferences: {
     defaultTaskView: 'kanban',
     defaultTaskSort: 'none'
-  });
+  },
+  setUserPreferences: (val) => set(state => ({ userPreferences: typeof val === 'function' ? val(state.userPreferences) : val })),
+
+  leads: initialLeads,
+  setLeads: (val) => set(state => ({ leads: typeof val === 'function' ? val(state.leads) : val })),
+
+  clients: initialClients,
+  setClients: (val) => set(state => ({ clients: typeof val === 'function' ? val(state.clients) : val })),
+
+  projects: initialProjects,
+  setProjects: (val) => set(state => ({ projects: typeof val === 'function' ? val(state.projects) : val })),
+
+  tasks: initialTasks,
+  setTasks: (val) => set(state => ({ tasks: typeof val === 'function' ? val(state.tasks) : val })),
+
+  reportTemplates: [
+    {
+      id: 'default-template',
+      name: 'Default Executive Briefing',
+      structure: 'Focus on high-level progress, financial health, and actionable items. Do not use overly robotic language.\n\nReturn formatted nicely in Markdown with headings like 🌟 Highlights, 📊 Financial Pulse, ⚠️ Attention Required.',
+      isActive: true
+    }
+  ],
+  setReportTemplates: (val) => set(state => ({ reportTemplates: typeof val === 'function' ? val(state.reportTemplates) : val })),
   
-  const [leads, setLeads] = useState<Lead[]>(initialLeads);
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+}));
+
+export const useAppContext = useAppStore;
+
+export function AppProvider({ children }: { children: ReactNode }) {
+  const tasks = useAppStore(s => s.tasks);
+  const projects = useAppStore(s => s.projects);
+  const setProjects = useAppStore(s => s.setProjects);
+  const setTasks = useAppStore(s => s.setTasks);
+  const addNotification = useAppStore(s => s.addNotification);
+
+  const previousProjectsRef = React.useRef(projects);
+
+  useEffect(() => {
+    const prevProjects = previousProjectsRef.current;
+    if (prevProjects !== projects) {
+      const newlyCompleted = projects.filter(p => 
+        p.status === 'Completed' && 
+        prevProjects.find(pp => pp.id === p.id)?.status !== 'Completed'
+      );
+      
+      newlyCompleted.forEach(p => {
+        addNotification({
+          message: `Milestone Broadcast: "${p.name}" has officially been completed! Client ${p.client} has been notified.`,
+          type: 'success'
+        });
+      });
+      
+      previousProjectsRef.current = projects;
+    }
+  }, [projects, addNotification]);
+
+  const previousTasksRef = React.useRef(tasks);
+
+  useEffect(() => {
+    const prevTasks = previousTasksRef.current;
+    if (prevTasks !== tasks) {
+      const newlyCompleted = tasks.filter(t => 
+        t.status === 'Completed' && 
+        prevTasks.find(pt => pt.id === t.id)?.status !== 'Completed'
+      );
+      
+      newlyCompleted.forEach(t => {
+        addNotification({
+          message: `Great news! The "${t.title}" task has been marked as completed.`,
+          type: 'success'
+        });
+      });
+      
+      previousTasksRef.current = tasks;
+    }
+  }, [tasks, addNotification]);
+
 
   // Sync Global Tasks -> Projects
   useEffect(() => {
@@ -517,15 +467,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
           lastActiveProgress: t.lastActiveProgress,
           subtasks: t.subtasks
         }));
-
-        const projectTaskStr = JSON.stringify(p.tasks);
-        const gTasksStr = JSON.stringify(pTasks);
-
-        if (projectTaskStr !== gTasksStr) {
+        
+        // Safer comparison
+        const oldTasksStr = JSON.stringify((p.tasks || []).map(t => ({ id: t.id, progress: t.progress, status: t.status, subtasks: t.subtasks })));
+        const newTasksStr = JSON.stringify(pTasks.map(t => ({ id: t.id, progress: t.progress, status: t.status, subtasks: t.subtasks })));
+        
+        if (oldTasksStr !== newTasksStr) {
           changed = true;
           const tot = pTasks.reduce((sum, t) => sum + (t.progress || 0), 0);
           let newProg = pTasks.length > 0 ? Math.round(tot / pTasks.length) : 0;
-          // Auto-adjust project status based on task progress
           let newStatus = p.status;
           if (newProg === 100) newStatus = 'Completed';
           else if (newProg === 0) newStatus = 'Not Started';
@@ -536,78 +486,38 @@ export function AppProvider({ children }: { children: ReactNode }) {
       });
       return changed ? next : prevProjects;
     });
-  }, [tasks]);
+  }, [tasks, setProjects]);
 
   // Sync Projects -> Global Tasks
   useEffect(() => {
     setTasks(prevTasks => {
       let changed = false;
       let nextTasks = [...prevTasks];
-
       projects.forEach(p => {
         (p.tasks || []).forEach(pt => {
           const tIdx = nextTasks.findIndex(t => t.id === pt.id);
           if (tIdx !== -1) {
             const t = nextTasks[tIdx];
-            if (t.progress !== pt.progress || t.status !== pt.status || JSON.stringify(t.subtasks) !== JSON.stringify(pt.subtasks)) {
+            const oldTStr = JSON.stringify({ progress: t.progress, status: t.status, subtasks: t.subtasks });
+            const newTStr = JSON.stringify({ progress: pt.progress, status: pt.status || t.status, subtasks: pt.subtasks });
+            
+            if (oldTStr !== newTStr) {
               changed = true;
               nextTasks[tIdx] = { 
-                ...t, 
-                progress: pt.progress, 
-                status: pt.status || t.status, 
-                subtasks: pt.subtasks, 
-                lastActiveProgress: pt.lastActiveProgress 
-              };
+                 ...t, 
+                 progress: pt.progress, 
+                 status: pt.status || t.status, 
+                 subtasks: pt.subtasks, 
+                 lastActiveProgress: pt.lastActiveProgress 
+               };
             }
           }
         });
       });
       return changed ? nextTasks : prevTasks;
     });
-  }, [projects]);
+  }, [projects, setTasks]);
+  
 
-  const addNotification = (notification: Omit<Notification, 'id' | 'createdAt' | 'read'>) => {
-    setNotifications(prev => [
-      {
-        ...notification,
-        id: `noti-${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        read: false
-      },
-      ...prev
-    ]);
-  };
-
-  const markNotificationRead = (id: string) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-  };
-
-  const markAllNotificationsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  };
-
-  return (
-    <AppContext.Provider value={{
-      currentUser, login, logout,
-      roles, setRoles,
-      rolePermissions, setRolePermissions,
-      teamMembers, setTeamMembers,
-      notifications, addNotification, markNotificationRead, markAllNotificationsRead,
-      userPreferences, setUserPreferences,
-      leads, setLeads,
-      clients, setClients,
-      projects, setProjects,
-      tasks, setTasks
-    }}>
-      {children}
-    </AppContext.Provider>
-  );
-}
-
-export function useAppContext() {
-  const context = useContext(AppContext);
-  if (context === undefined) {
-    throw new Error('useAppContext must be used within an AppProvider');
-  }
-  return context;
+  return <>{children}</>;
 }

@@ -3,7 +3,13 @@ import { User, Bell, Shield, Key, Globe, CreditCard, Building, ShieldCheck, Chec
 import { useAppContext, permissionCategories } from '../context/AppContext';
 
 export function Settings() {
-  const { roles, setRoles, rolePermissions, setRolePermissions, userPreferences, setUserPreferences, addNotification } = useAppContext();
+  const roles = useAppContext(s => s.roles);
+  const setRoles = useAppContext(s => s.setRoles);
+  const rolePermissions = useAppContext(s => s.rolePermissions);
+  const setRolePermissions = useAppContext(s => s.setRolePermissions);
+  const userPreferences = useAppContext(s => s.userPreferences);
+  const setUserPreferences = useAppContext(s => s.setUserPreferences);
+  const addNotification = useAppContext(s => s.addNotification);
   const [activeTab, setActiveTab] = useState('profile');
   
   // Roles state
@@ -64,6 +70,8 @@ export function Settings() {
     nextBilling: '2024-04-15',
     amount: '$49.00'
   });
+
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   const tabs = [
     { id: 'profile', name: 'Profile', icon: User },
@@ -168,9 +176,20 @@ export function Settings() {
                     A
                   </div>
                   <div>
-                    <button onClick={() => addNotification({ type: 'info', message: 'Avatar upload coming soon.' })} className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-slate-700">
+                    <label htmlFor="avatar-upload" className="cursor-pointer bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-slate-700 inline-block">
                       Change Avatar
-                    </button>
+                    </label>
+                    <input 
+                      type="file" 
+                      id="avatar-upload" 
+                      className="hidden" 
+                      accept="image/png, image/jpeg, image/gif"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          addNotification({ type: 'success', message: 'Avatar updated successfully!' });
+                        }
+                      }}
+                    />
                     <p className="text-xs text-slate-500 mt-2">JPG, GIF or PNG. 1MB max.</p>
                   </div>
                 </div>
@@ -706,7 +725,7 @@ export function Settings() {
                         <div className="text-xs text-slate-400">Expires 12/2025</div>
                       </div>
                     </div>
-                    <button onClick={() => addNotification({ type: 'info', message: 'Payment method editing form coming soon.' })} className="text-sm font-medium text-[#0ED7A8] hover:text-[#0ED7A8]/80">
+                    <button onClick={() => setIsPaymentModalOpen(true)} className="text-sm font-medium text-[#0ED7A8] hover:text-[#0ED7A8]/80">
                       Edit
                     </button>
                   </div>
@@ -746,6 +765,49 @@ export function Settings() {
           )}
         </div>
       </div>
+
+      {isPaymentModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1E2D40] rounded-2xl border border-slate-700 w-full max-w-md overflow-hidden shadow-2xl">
+            <div className="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
+              <h3 className="text-xl font-bold text-white flex items-center gap-2"><CreditCard className="w-5 h-5 text-[#0ED7A8]"/> Update Payment Method</h3>
+              <button onClick={() => setIsPaymentModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              addNotification({ type: 'success', message: 'Payment method updated successfully!' });
+              setIsPaymentModalOpen(false);
+            }} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">Card Number</label>
+                <div className="relative">
+                   <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                   <input type="text" required placeholder="0000 0000 0000 0000" className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-white focus:outline-none focus:border-[#0ED7A8] transition-colors" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Expiry Date</label>
+                  <input type="text" required placeholder="MM/YY" className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#0ED7A8] transition-colors" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">CVC</label>
+                  <input type="text" required placeholder="123" className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#0ED7A8] transition-colors" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">Name on Card</label>
+                <input type="text" required placeholder="John Doe" className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#0ED7A8] transition-colors" />
+              </div>
+              <button type="submit" className="w-full bg-[#0ED7A8] hover:bg-[#0ED7A8]/90 text-slate-900 px-6 py-3 rounded-xl font-bold shadow-lg shadow-[#0ED7A8]/20 transition-colors mt-4">
+                Save Payment Method
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

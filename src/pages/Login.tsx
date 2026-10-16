@@ -7,7 +7,7 @@ export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAppContext();
+  const login = useAppContext(s => s.login);
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -16,7 +16,7 @@ export function Login() {
       setError('');
       login(email, password);
       navigate('/');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message);
     }
   };
